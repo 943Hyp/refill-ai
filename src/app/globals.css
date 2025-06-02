@@ -1,0 +1,205 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 264 48% 8%;
+    --foreground: 264 30% 94%;
+
+    --card: 264 48% 10%;
+    --card-foreground: 264 30% 94%;
+
+    --popover: 264 48% 8%;
+    --popover-foreground: 264 30% 94%;
+
+    --primary: 288 70% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 208 80% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 156 80% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --muted: 264 48% 15%;
+    --muted-foreground: 264 30% 70%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 264 48% 20%;
+    --input: 264 48% 20%;
+    --ring: 288 70% 60%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-color: #140b26;
+    color: #f5f0ff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(186, 104, 200, 0.5),
+                0 0 10px rgba(186, 104, 200, 0.3),
+                0 0 15px rgba(186, 104, 200, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(104, 186, 200, 0.5),
+                0 0 15px rgba(104, 186, 200, 0.3),
+                0 0 20px rgba(104, 186, 200, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(186, 104, 200, 0.5),
+                0 0 10px rgba(186, 104, 200, 0.3),
+                0 0 15px rgba(186, 104, 200, 0.1);
+  }
+}
+
+@keyframes colorShift {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(30deg);
+  }
+  100% {
+    filter: hue-rotate(0deg);
+  }
+}
+
+@keyframes textGlow {
+  0% {
+    text-shadow: 0 0 5px rgba(186, 104, 200, 0.7),
+                 0 0 10px rgba(104, 186, 200, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(104, 186, 200, 0.7),
+                 0 0 15px rgba(186, 104, 200, 0.5);
+  }
+  100% {
+    text-shadow: 0 0 5px rgba(186, 104, 200, 0.7),
+                 0 0 10px rgba(104, 186, 200, 0.5);
+  }
+}
+
+@keyframes borderGlow {
+  0% {
+    border-color: rgba(186, 104, 200, 0.7);
+    box-shadow: 0 0 5px rgba(186, 104, 200, 0.7);
+  }
+  50% {
+    border-color: rgba(104, 186, 200, 0.7);
+    box-shadow: 0 0 10px rgba(104, 186, 200, 0.7);
+  }
+  100% {
+    border-color: rgba(186, 104, 200, 0.7);
+    box-shadow: 0 0 5px rgba(186, 104, 200, 0.7);
+  }
+}
+
+.glow-effect {
+  animation: glow 3s infinite ease-in-out;
+}
+
+.color-shift {
+  animation: colorShift 8s infinite linear;
+}
+
+.text-glow {
+  animation: textGlow 3s infinite ease-in-out;
+}
+
+.border-glow {
+  animation: borderGlow 3s infinite ease-in-out;
+}
+
+/* 多彩流动按钮 */
+.gradient-button {
+  background: linear-gradient(90deg, #ff56f6, #b936ee, #3a8af7, #56eef6);
+  background-size: 300% 100%;
+  animation: gradientMove 4s ease infinite;
+  transition: all 0.3s ease;
+}
+
+.gradient-button:hover {
+  background-size: 100% 100%;
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* 炫彩Logo */
+.refill-logo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refill-logo::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: conic-gradient(from 0deg, #ff56f6, #b936ee, #3a8af7, #56eef6, #ff56f6);
+  border-radius: 50%;
+  animation: rotate 3s linear infinite;
+  z-index: -1;
+  filter: blur(8px);
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 动态光标效果 */
+.cursor-glow {
+  cursor: pointer;
+  position: relative;
+}
+
+.cursor-glow::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(104, 186, 200, 0.4) 0%, rgba(186, 104, 200, 0) 70%);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.cursor-glow:hover::after {
+  opacity: 1;
+}
