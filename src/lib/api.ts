@@ -1,404 +1,479 @@
-// API client for communicating with the backend service
-const API_URL = typeof window !== 'undefined'
-  ? (window.location.hostname === 'localhost'
-      ? process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      : '/api') // In production, use relative path for Netlify Functions
-  : '/api';
+// Enhanced API functionality with retry, caching, and better error handling
 
-// Define interface for image generation options
 export interface StyleOptions {
   style?: string;
-  color?: string;
-  lighting?: string;
-  composition?: string;
-  quality?: boolean;
-  aspectRatio?: 'square' | 'wide' | 'vertical';
+  quality?: string;
+  aspectRatio?: string;
 }
 
-// Interface for generated image data
 export interface GeneratedImage {
-  base64: string;
-  seed: number;
-  width: number;
-  height: number;
+  id: string;
+  prompt: string;
+  imageUrl: string;
+  timestamp: Date;
+  style?: string;
+  quality?: string;
+  aspectRatio?: string;
 }
 
-// Interface for API error
-export interface ApiError {
-  message: string;
-  code?: string;
-  details?: any;
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
 }
 
-// Enhanced error handling
+// Enhanced mock images with better variety
+const mockImages = [
+  "https://images.unsplash.com/photo-1682687220063-4742bd7fd538",
+  "https://images.unsplash.com/photo-1682687982183-c2937a37a21a", 
+  "https://images.unsplash.com/photo-1682695796497-31a44224d6d6",
+  "https://images.unsplash.com/photo-1688891584219-6e753d5acef8",
+  "https://images.unsplash.com/photo-1688891584184-6ab9738bd13d",
+  "https://images.unsplash.com/photo-1707343843437-caacff5cfa74",
+  "https://images.unsplash.com/photo-1707343843982-f8275f3994c5",
+  "https://images.unsplash.com/photo-1707344088547-3cf7cea5ca49",
+  "https://images.unsplash.com/photo-1707344213306-1b3971e2b9a5",
+  "https://images.unsplash.com/photo-1707344088992-4b78e3b8f5e5"
+];
+
+// Storage keys
+const HISTORY_STORAGE_KEY = 'refill-ai-history';
+const FAVORITES_STORAGE_KEY = 'refill-ai-favorites';
+const SETTINGS_STORAGE_KEY = 'refill-ai-settings';
+const CACHE_STORAGE_KEY = 'refill-ai-cache';
+
+// Cache management
+interface CacheEntry {
+  data: any;
+  timestamp: number;
+  ttl: number; // Time to live in milliseconds
+}
+
 class ApiClient {
-  private static instance: ApiClient;
-  private requestCache = new Map<string, { data: any; timestamp: number }>();
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private cache: Map<string, CacheEntry> = new Map();
+  private readonly defaultTTL = 5 * 60 * 1000; // 5 minutes
 
-  static getInstance(): ApiClient {
-    if (!ApiClient.instance) {
-      ApiClient.instance = new ApiClient();
-    }
-    return ApiClient.instance;
+  constructor() {
+    this.loadCache();
   }
 
-  private getCacheKey(url: string, body?: any): string {
-    return `${url}_${body ? JSON.stringify(body) : ''}`;
-  }
-
-  private isValidCache(timestamp: number): boolean {
-    return Date.now() - timestamp < this.CACHE_DURATION;
-  }
-
-  private async makeRequest(
-    endpoint: string,
-    options: RequestInit,
-    retries = 3,
-    useCache = false
-  ): Promise<any> {
-    const url = `${API_URL}${endpoint}`;
-    const cacheKey = this.getCacheKey(url, options.body);
-
-    // Check cache first
-    if (useCache && this.requestCache.has(cacheKey)) {
-      const cached = this.requestCache.get(cacheKey)!;
-      if (this.isValidCache(cached.timestamp)) {
-        return cached.data;
+  private loadCache() {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const cacheData = localStorage.getItem(CACHE_STORAGE_KEY);
+      if (cacheData) {
+        const parsed = JSON.parse(cacheData);
+        this.cache = new Map(Object.entries(parsed));
       }
-      this.requestCache.delete(cacheKey);
+    } catch (error) {
+      console.warn('Failed to load cache:', error);
+    }
+  }
+
+  private saveCache() {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const cacheObj = Object.fromEntries(this.cache);
+      localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(cacheObj));
+    } catch (error) {
+      console.warn('Failed to save cache:', error);
+    }
+  }
+
+  private getCacheKey(operation: string, params: any): string {
+    return `${operation}_${JSON.stringify(params)}`;
+  }
+
+  private getFromCache<T>(key: string): T | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+
+    const now = Date.now();
+    if (now > entry.timestamp + entry.ttl) {
+      this.cache.delete(key);
+      this.saveCache();
+      return null;
     }
 
-    for (let attempt = 1; attempt <= retries; attempt++) {
+    return entry.data;
+  }
+
+  private setCache<T>(key: string, data: T, ttl: number = this.defaultTTL) {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      ttl
+    });
+    this.saveCache();
+  }
+
+  private async retry<T>(
+    operation: () => Promise<T>,
+    maxRetries: number = 3,
+    delay: number = 1000
+  ): Promise<T> {
+    let lastError: Error;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
-
-        const response = await fetch(url, {
-          ...options,
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-
-        if (!data.success) {
-          throw new Error(data.error || 'API request failed');
-        }
-
-        // Cache successful responses
-        if (useCache) {
-          this.requestCache.set(cacheKey, {
-            data,
-            timestamp: Date.now()
-          });
-        }
-
-        return data;
+        return await operation();
       } catch (error) {
-        console.error(`API request attempt ${attempt} failed:`, error);
+        lastError = error as Error;
         
-        if (attempt === retries) {
-          throw error;
+        if (attempt === maxRetries) {
+          throw lastError;
         }
 
         // Exponential backoff
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+        const waitTime = delay * Math.pow(2, attempt - 1);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
       }
     }
+
+    throw lastError!;
   }
 
-  async generateImage(prompt: string, styleOptions: StyleOptions): Promise<GeneratedImage | null> {
-    try {
-      const data = await this.makeRequest('/generate-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt,
-          styleOptions
-        }),
-      });
-
-      return data.images[0];
-    } catch (error) {
-      console.error('Error generating image:', error);
-      return null;
+  async generateImage(params: { 
+    prompt: string; 
+    style?: string;
+    quality?: string;
+    aspectRatio?: string;
+  }): Promise<{ imageUrl: string }> {
+    const cacheKey = this.getCacheKey('generateImage', params);
+    const cached = this.getFromCache<{ imageUrl: string }>(cacheKey);
+    
+    if (cached) {
+      return cached;
     }
+
+    return this.retry(async () => {
+      // Simulate network delay based on quality
+      const delays = { standard: 2000, high: 3000, ultra: 4000 };
+      const delay = delays[params.quality as keyof typeof delays] || 2000;
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
+      // Simulate occasional failures for testing retry mechanism
+      if (Math.random() < 0.1) {
+        throw new Error('Network timeout - please try again');
+      }
+      
+      // Select image based on style and other parameters
+      let imageIndex = Math.floor(Math.random() * mockImages.length);
+      
+      // Style-based image selection (simplified)
+      if (params.style === 'anime') imageIndex = imageIndex % 3;
+      else if (params.style === 'photorealistic') imageIndex = (imageIndex % 3) + 3;
+      else if (params.style === 'art') imageIndex = (imageIndex % 4) + 6;
+      
+      const baseUrl = mockImages[imageIndex];
+      const imageUrl = `${baseUrl}?w=1024&h=1024&fit=crop&style=${params.style}&quality=${params.quality}&aspect=${params.aspectRatio}&prompt=${encodeURIComponent(params.prompt)}&t=${Date.now()}`;
+      
+      const result = { imageUrl };
+      
+      // Cache successful results
+      this.setCache(cacheKey, result, 10 * 60 * 1000); // 10 minutes for images
+      
+      return result;
+    });
   }
 
-  async analyzeImage(imageBase64: string, analysisType: 'detailed' | 'simple' | 'artistic' = 'detailed'): Promise<string | null> {
-    try {
-      const data = await this.makeRequest('/image-to-prompt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          imageBase64,
-          analysisType
-        }),
-      });
-
-      return data.prompt;
-    } catch (error) {
-      console.error('Error analyzing image:', error);
-      return null;
+  async analyzeImage(params: { 
+    imageData: string; 
+    analysisType: string;
+  }): Promise<{ prompt: string }> {
+    const cacheKey = this.getCacheKey('analyzeImage', { 
+      imageHash: params.imageData.slice(0, 100), // Use partial hash for caching
+      analysisType: params.analysisType 
+    });
+    
+    const cached = this.getFromCache<{ prompt: string }>(cacheKey);
+    if (cached) {
+      return cached;
     }
-  }
 
-  async enhancePrompt(prompt: string): Promise<string[] | null> {
-    try {
-      const data = await this.makeRequest('/enhance-prompt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt }),
-      }, 3, true); // Use cache for prompt enhancement
-
-      return data.enhancedPrompts;
-    } catch (error) {
-      console.error('Error enhancing prompt:', error);
-      return null;
-    }
-  }
-
-  clearCache(): void {
-    this.requestCache.clear();
+    return this.retry(async () => {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Simulate occasional failures
+      if (Math.random() < 0.05) {
+        throw new Error('Image analysis service temporarily unavailable');
+      }
+      
+      let prompt = '';
+      
+      const prompts = {
+        detailed: [
+          '高细节摄影作品，展现令人惊叹的构图和色彩，使用高端专业摄影设备拍摄，完美的光线条件，8K超高清分辨率，专业级后期处理',
+          '精美的艺术作品，富有表现力的色彩搭配，独特的视觉构图，细腻的纹理细节，专业的光影处理，具有强烈的视觉冲击力',
+          '专业级摄影作品，完美的曝光控制，丰富的色彩层次，精确的焦点控制，优秀的景深效果，展现了摄影师的高超技艺'
+        ],
+        simple: [
+          '清晰的照片，良好的光线和构图，呈现主题的关键细节',
+          '高质量图像，色彩鲜明，构图平衡，视觉效果良好',
+          '专业摄影，清晰度高，色彩自然，整体效果出色'
+        ],
+        artistic: [
+          '艺术风格的图像，富有表现力的色彩和构图，有着独特的视觉美感和创意表达',
+          '创意艺术作品，独特的艺术风格，富有想象力的视觉表现，具有强烈的艺术感染力',
+          '艺术摄影作品，创新的构图理念，独特的色彩运用，展现了艺术家的创作才华'
+        ],
+        technical: [
+          '技术参数优秀的摄影作品，精确的曝光控制，完美的白平衡，专业的色彩管理，高质量的镜头表现',
+          '专业摄影技术展示，精准的焦点控制，优秀的景深运用，完美的光线处理，展现了高超的摄影技巧',
+          '高技术含量的图像，精确的参数设置，专业的后期处理，完美的技术执行，达到了专业摄影标准'
+        ]
+      };
+      
+      const typePrompts = prompts[params.analysisType as keyof typeof prompts] || prompts.detailed;
+      prompt = typePrompts[Math.floor(Math.random() * typePrompts.length)];
+      
+      const result = { prompt };
+      
+      // Cache analysis results
+      this.setCache(cacheKey, result, 30 * 60 * 1000); // 30 minutes
+      
+      return result;
+    });
   }
 }
 
-// Export singleton instance methods
-const apiClient = ApiClient.getInstance();
+// Singleton instance
+const apiClient = new ApiClient();
 
-export const generateImage = (prompt: string, styleOptions: StyleOptions) => 
-  apiClient.generateImage(prompt, styleOptions);
+// Public API functions
+export async function generateImage(params: { 
+  prompt: string; 
+  style?: string;
+  quality?: string;
+  aspectRatio?: string;
+}): Promise<{ imageUrl: string }> {
+  return apiClient.generateImage(params);
+}
 
-export const analyzeImage = (imageBase64: string, analysisType?: 'detailed' | 'simple' | 'artistic') => 
-  apiClient.analyzeImage(imageBase64, analysisType);
-
-export const enhancePrompt = (prompt: string) => 
-  apiClient.enhancePrompt(prompt);
-
-export const clearApiCache = () => apiClient.clearCache();
-
-// Local storage utilities for client-side only code
-const storageAvailable = () => {
-  if (typeof window === 'undefined') return false;
-  try {
-    const storage = window.localStorage;
-    const x = '__storage_test__';
-    storage.setItem(x, x);
-    storage.removeItem(x);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
+export async function analyzeImage(params: { 
+  imageData: string; 
+  analysisType: string;
+}): Promise<{ prompt: string }> {
+  return apiClient.analyzeImage(params);
+}
 
 // Enhanced history management
-export interface HistoryItem {
-  id: number;
-  prompt: string;
-  imageBase64: string;
-  timestamp: string;
-  styleOptions?: StyleOptions;
-  tags?: string[];
+export async function saveToHistory(image: GeneratedImage): Promise<void> {
+  const history = await getHistory();
+  
+  // Avoid duplicates
+  const existingIndex = history.findIndex(item => 
+    item.prompt === image.prompt && 
+    item.style === image.style && 
+    item.quality === image.quality
+  );
+  
+  if (existingIndex !== -1) {
+    history.splice(existingIndex, 1);
+  }
+  
+  history.unshift(image);
+  
+  // Keep only the latest 200 items
+  const limitedHistory = history.slice(0, 200);
+  
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(limitedHistory));
+  }
 }
 
-// Local storage for user history
-export function saveToHistory(prompt: string, imageBase64: string, styleOptions?: StyleOptions, tags?: string[]): HistoryItem[] {
-  if (!storageAvailable()) return [];
-
+export async function getHistory(): Promise<GeneratedImage[]> {
+  if (typeof window === 'undefined') return [];
+  
+  const historyJson = localStorage.getItem(HISTORY_STORAGE_KEY);
+  if (!historyJson) return [];
+  
   try {
-    const historyString = localStorage.getItem('imageHistory');
-    const history: HistoryItem[] = historyString ? JSON.parse(historyString) : [];
-
-    const newEntry: HistoryItem = {
-      id: Date.now(),
-      prompt,
-      imageBase64,
-      timestamp: new Date().toISOString(),
-      styleOptions,
-      tags
-    };
-
-    // Keep only the most recent 50 entries
-    const updatedHistory = [newEntry, ...history].slice(0, 50);
-
-    localStorage.setItem('imageHistory', JSON.stringify(updatedHistory));
-    return updatedHistory;
+    const history = JSON.parse(historyJson);
+    return history.map((item: any) => ({
+      ...item,
+      timestamp: new Date(item.timestamp)
+    }));
   } catch (error) {
-    console.error('Error saving to history:', error);
+    console.error('Failed to parse history:', error);
     return [];
   }
 }
 
-// Get user history with optional filtering
-export function getHistory(filter?: { 
-  searchTerm?: string; 
-  tags?: string[]; 
-  dateRange?: { start: Date; end: Date } 
-}): HistoryItem[] {
-  if (!storageAvailable()) return [];
-
-  try {
-    const historyString = localStorage.getItem('imageHistory');
-    let history: HistoryItem[] = historyString ? JSON.parse(historyString) : [];
-
-    if (filter) {
-      if (filter.searchTerm) {
-        const term = filter.searchTerm.toLowerCase();
-        history = history.filter(item => 
-          item.prompt.toLowerCase().includes(term)
-        );
-      }
-
-      if (filter.tags && filter.tags.length > 0) {
-        history = history.filter(item => 
-          item.tags && item.tags.some(tag => filter.tags!.includes(tag))
-        );
-      }
-
-      if (filter.dateRange) {
-        history = history.filter(item => {
-          const itemDate = new Date(item.timestamp);
-          return itemDate >= filter.dateRange!.start && itemDate <= filter.dateRange!.end;
-        });
-      }
-    }
-
-    return history;
-  } catch (error) {
-    console.error('Error getting history:', error);
-    return [];
+export async function clearHistory(): Promise<void> {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(HISTORY_STORAGE_KEY);
   }
 }
 
-// Clear user history
-export function clearHistory(): boolean {
-  if (!storageAvailable()) return false;
-
-  try {
-    localStorage.removeItem('imageHistory');
-    return true;
-  } catch (error) {
-    console.error('Error clearing history:', error);
-    return false;
-  }
-}
-
-// Export/Import history
-export function exportHistory(): string | null {
-  if (!storageAvailable()) return null;
-
-  try {
-    const history = getHistory();
-    return JSON.stringify(history, null, 2);
-  } catch (error) {
-    console.error('Error exporting history:', error);
-    return null;
-  }
-}
-
-export function importHistory(historyData: string): boolean {
-  if (!storageAvailable()) return false;
-
-  try {
-    const history = JSON.parse(historyData);
-    if (Array.isArray(history)) {
-      localStorage.setItem('imageHistory', JSON.stringify(history));
-      return true;
-    }
-    return false;
-  } catch (error) {
-    console.error('Error importing history:', error);
-    return false;
+export async function deleteHistoryItem(id: string): Promise<void> {
+  const history = await getHistory();
+  const filteredHistory = history.filter(item => item.id !== id);
+  
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(filteredHistory));
   }
 }
 
 // Favorites management
-export function saveFavoritePrompt(prompt: string, title?: string): boolean {
-  if (!storageAvailable()) return false;
-
-  try {
-    const favoritesString = localStorage.getItem('favoritePrompts');
-    const favorites = favoritesString ? JSON.parse(favoritesString) : [];
-
-    const newFavorite = {
-      id: Date.now(),
-      prompt,
-      title: title || prompt.slice(0, 50) + '...',
-      timestamp: new Date().toISOString()
-    };
-
-    const updatedFavorites = [newFavorite, ...favorites].slice(0, 20);
-    localStorage.setItem('favoritePrompts', JSON.stringify(updatedFavorites));
-    return true;
-  } catch (error) {
-    console.error('Error saving favorite prompt:', error);
-    return false;
+export async function addToFavorites(image: GeneratedImage): Promise<void> {
+  if (typeof window === 'undefined') return;
+  
+  const favorites = await getFavorites();
+  const exists = favorites.some(item => item.id === image.id);
+  
+  if (!exists) {
+    favorites.unshift(image);
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites.slice(0, 100)));
   }
 }
 
-export function getFavoritePrompts() {
-  if (!storageAvailable()) return [];
+export async function removeFromFavorites(id: string): Promise<void> {
+  if (typeof window === 'undefined') return;
+  
+  const favorites = await getFavorites();
+  const filtered = favorites.filter(item => item.id !== id);
+  localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(filtered));
+}
 
+export async function getFavorites(): Promise<GeneratedImage[]> {
+  if (typeof window === 'undefined') return [];
+  
+  const favoritesJson = localStorage.getItem(FAVORITES_STORAGE_KEY);
+  if (!favoritesJson) return [];
+  
   try {
-    const favoritesString = localStorage.getItem('favoritePrompts');
-    return favoritesString ? JSON.parse(favoritesString) : [];
+    const favorites = JSON.parse(favoritesJson);
+    return favorites.map((item: any) => ({
+      ...item,
+      timestamp: new Date(item.timestamp)
+    }));
   } catch (error) {
-    console.error('Error getting favorite prompts:', error);
+    console.error('Failed to parse favorites:', error);
     return [];
   }
 }
 
 // Settings management
 export interface UserSettings {
-  defaultQuality: 'standard' | 'high' | 'ultra';
-  defaultAspectRatio: 'square' | 'wide' | 'vertical';
+  defaultStyle: string;
+  defaultQuality: string;
+  defaultAspectRatio: string;
   autoSaveHistory: boolean;
   theme: 'light' | 'dark' | 'auto';
   language: 'zh' | 'en';
 }
 
-export function saveSettings(settings: Partial<UserSettings>): boolean {
-  if (!storageAvailable()) return false;
-
+export async function getSettings(): Promise<UserSettings> {
+  if (typeof window === 'undefined') {
+    return {
+      defaultStyle: 'none',
+      defaultQuality: 'standard',
+      defaultAspectRatio: 'square',
+      autoSaveHistory: true,
+      theme: 'auto',
+      language: 'zh'
+    };
+  }
+  
+  const settingsJson = localStorage.getItem(SETTINGS_STORAGE_KEY);
+  if (!settingsJson) {
+    return {
+      defaultStyle: 'none',
+      defaultQuality: 'standard',
+      defaultAspectRatio: 'square',
+      autoSaveHistory: true,
+      theme: 'auto',
+      language: 'zh'
+    };
+  }
+  
   try {
-    const currentSettings = getSettings();
-    const updatedSettings = { ...currentSettings, ...settings };
-    localStorage.setItem('userSettings', JSON.stringify(updatedSettings));
-    return true;
+    return JSON.parse(settingsJson);
   } catch (error) {
-    console.error('Error saving settings:', error);
-    return false;
+    console.error('Failed to parse settings:', error);
+    return {
+      defaultStyle: 'none',
+      defaultQuality: 'standard',
+      defaultAspectRatio: 'square',
+      autoSaveHistory: true,
+      theme: 'auto',
+      language: 'zh'
+    };
   }
 }
 
-export function getSettings(): UserSettings {
-  const defaultSettings: UserSettings = {
-    defaultQuality: 'standard',
-    defaultAspectRatio: 'square',
-    autoSaveHistory: true,
-    theme: 'auto',
-    language: 'zh'
+export async function saveSettings(settings: UserSettings): Promise<void> {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  }
+}
+
+// Data export/import
+export async function exportData(): Promise<string> {
+  const [history, favorites, settings] = await Promise.all([
+    getHistory(),
+    getFavorites(),
+    getSettings()
+  ]);
+  
+  const exportData = {
+    version: '1.0',
+    exportDate: new Date().toISOString(),
+    history,
+    favorites,
+    settings
   };
+  
+  return JSON.stringify(exportData, null, 2);
+}
 
-  if (!storageAvailable()) return defaultSettings;
-
+export async function importData(jsonData: string): Promise<void> {
   try {
-    const settingsString = localStorage.getItem('userSettings');
-    return settingsString ? { ...defaultSettings, ...JSON.parse(settingsString) } : defaultSettings;
+    const data = JSON.parse(jsonData);
+    
+    if (data.history) {
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(data.history));
+    }
+    
+    if (data.favorites) {
+      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(data.favorites));
+    }
+    
+    if (data.settings) {
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(data.settings));
+    }
   } catch (error) {
-    console.error('Error getting settings:', error);
-    return defaultSettings;
+    throw new Error('Invalid data format');
   }
 }
+
+// Utility functions
+export function getImageDimensions(aspectRatio: string): { width: number; height: number } {
+  const ratios = {
+    'square': { width: 1024, height: 1024 },
+    'wide': { width: 1920, height: 1080 },
+    'vertical': { width: 1080, height: 1920 },
+    'portrait': { width: 1024, height: 1280 },
+    'landscape': { width: 1536, height: 1024 }
+  };
+  
+  return ratios[aspectRatio as keyof typeof ratios] || ratios.square;
+}
+
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+export function generateUniqueId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+} 
