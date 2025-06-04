@@ -6,6 +6,8 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/sections/HeroSection';
 import FAQSection from '@/components/sections/FAQSection';
+import GallerySection from '@/components/sections/GallerySection';
+import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import TabsContainer from '@/components/TabsContainer';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
 import { Locale } from '@/lib/i18n';
@@ -72,6 +74,9 @@ export default function Home() {
           </section>
         )}
 
+        {/* Gallery Section - 精选作品展览 */}
+        {!showApp && <GallerySection locale={locale} />}
+
         {/* Features Section - Only show when not in app mode */}
         {!showApp && (
           <section id="features" className="py-20 px-4">
@@ -135,6 +140,9 @@ export default function Home() {
             </div>
           </section>
         )}
+
+        {/* Testimonials Section - 用户评价 */}
+        {!showApp && <TestimonialsSection locale={locale} />}
 
         {/* FAQ Section - Only show when not in app mode */}
         {!showApp && <FAQSection locale={locale} />}
