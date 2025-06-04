@@ -24,6 +24,7 @@ const TabsContainer = forwardRef<TabsContainerRef, TabsContainerProps>(
     const imageGeneratorRef = useRef<{ 
       handleGenerate: () => void; 
       handleClear: () => void; 
+      setPrompt: (prompt: string) => void;
     }>(null);
     const imageToPromptRef = useRef<{ 
       handleClear: () => void; 
@@ -106,11 +107,33 @@ const TabsContainer = forwardRef<TabsContainerRef, TabsContainerProps>(
             </TabsContent>
 
             <TabsContent value="templates" className="mt-0">
-              <PromptTemplates locale={locale} />
+              <PromptTemplates 
+                locale={locale}
+                setPrompt={(prompt) => {
+                  // Switch to generate tab and set the prompt
+                  setActiveTab('generate');
+                  // Pass the prompt to ImageGenerator
+                  if (imageGeneratorRef.current) {
+                    imageGeneratorRef.current.setPrompt(prompt);
+                  }
+                }}
+                setActiveTab={setActiveTab}
+              />
             </TabsContent>
 
             <TabsContent value="history" className="mt-0">
-              <HistoryView locale={locale} />
+              <HistoryView 
+                locale={locale}
+                setPrompt={(prompt) => {
+                  // Switch to generate tab and set the prompt
+                  setActiveTab('generate');
+                  // Pass the prompt to ImageGenerator
+                  if (imageGeneratorRef.current) {
+                    imageGeneratorRef.current.setPrompt(prompt);
+                  }
+                }}
+                setActiveTab={setActiveTab}
+              />
             </TabsContent>
           </div>
         </Tabs>

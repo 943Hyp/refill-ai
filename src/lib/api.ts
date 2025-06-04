@@ -1,5 +1,60 @@
 // Enhanced API functionality with retry, caching, and better error handling
 
+// Replicate API functions (using Next.js API routes)
+export async function generateImageWithReplicate(params: {
+  prompt: string;
+  style?: string;
+  quality?: string;
+  aspectRatio?: string;
+}): Promise<{ imageUrl: string }> {
+  try {
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    return { imageUrl: data.imageUrl };
+  } catch (error) {
+    console.error('Replicate image generation error:', error);
+    throw new Error(`Image generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+export async function analyzeImageWithReplicate(params: {
+  imageData: string;
+  analysisType: string;
+}): Promise<{ prompt: string }> {
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    return { prompt: data.prompt };
+  } catch (error) {
+    console.error('Replicate image analysis error:', error);
+    throw new Error(`Image analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
 export interface StyleOptions {
   style?: string;
   quality?: string;
@@ -44,7 +99,7 @@ const CACHE_STORAGE_KEY = 'refill-ai-cache';
 
 // Cache management
 interface CacheEntry {
-  data: any;
+  data: unknown;
   timestamp: number;
   ttl: number; // Time to live in milliseconds
 }
@@ -82,7 +137,7 @@ class ApiClient {
     }
   }
 
-  private getCacheKey(operation: string, params: any): string {
+  private getCacheKey(operation: string, params: Record<string, unknown>): string {
     return `${operation}_${JSON.stringify(params)}`;
   }
 
@@ -97,7 +152,7 @@ class ApiClient {
       return null;
     }
 
-    return entry.data;
+    return entry.data as T;
   }
 
   private setCache<T>(key: string, data: T, ttl: number = this.defaultTTL) {
@@ -250,6 +305,18 @@ export async function generateImage(params: {
   quality?: string;
   aspectRatio?: string;
 }): Promise<{ imageUrl: string }> {
+  // In client-side environment, try Replicate API first
+  if (typeof window !== 'undefined') {
+    try {
+      console.log('Attempting to use Replicate API for image generation');
+      return await generateImageWithReplicate(params);
+    } catch (error) {
+      console.warn('Replicate API failed, falling back to mock mode:', error);
+      // Fall back to mock mode if Replicate fails
+    }
+  }
+  
+  console.log('Using mock mode for image generation');
   return apiClient.generateImage(params);
 }
 
@@ -257,6 +324,18 @@ export async function analyzeImage(params: {
   imageData: string; 
   analysisType: string;
 }): Promise<{ prompt: string }> {
+  // In client-side environment, try Replicate API first
+  if (typeof window !== 'undefined') {
+    try {
+      console.log('Attempting to use Replicate API for image analysis');
+      return await analyzeImageWithReplicate(params);
+    } catch (error) {
+      console.warn('Replicate API failed, falling back to mock mode:', error);
+      // Fall back to mock mode if Replicate fails
+    }
+  }
+  
+  console.log('Using mock mode for image analysis');
   return apiClient.analyzeImage(params);
 }
 
@@ -293,10 +372,10 @@ export async function getHistory(): Promise<GeneratedImage[]> {
   
   try {
     const history = JSON.parse(historyJson);
-    return history.map((item: any) => ({
+    return history.map((item: Partial<GeneratedImage> & { timestamp: string | Date }) => ({
       ...item,
       timestamp: new Date(item.timestamp)
-    }));
+    })) as GeneratedImage[];
   } catch (error) {
     console.error('Failed to parse history:', error);
     return [];
@@ -347,10 +426,10 @@ export async function getFavorites(): Promise<GeneratedImage[]> {
   
   try {
     const favorites = JSON.parse(favoritesJson);
-    return favorites.map((item: any) => ({
+    return favorites.map((item: Partial<GeneratedImage> & { timestamp: string | Date }) => ({
       ...item,
       timestamp: new Date(item.timestamp)
-    }));
+    })) as GeneratedImage[];
   } catch (error) {
     console.error('Failed to parse favorites:', error);
     return [];

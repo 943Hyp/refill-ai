@@ -13,6 +13,7 @@ interface ImageGeneratorProps {
 export interface ImageGeneratorRef {
   handleGenerate: () => void;
   handleClear: () => void;
+  setPrompt: (prompt: string) => void;
 }
 
 const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
@@ -34,7 +35,8 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
     // Expose methods via ref
     useImperativeHandle(ref, () => ({
       handleGenerate: () => handleGenerateImage(),
-      handleClear: () => handleClear()
+      handleClear: () => handleClear(),
+      setPrompt: (prompt: string) => setPrompt(prompt)
     }));
 
     const styleOptions = [

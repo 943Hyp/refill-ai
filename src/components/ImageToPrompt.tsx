@@ -120,8 +120,11 @@ const ImageToPrompt = forwardRef<ImageToPromptRef, ImageToPromptProps>(
     const handleDrop = (event: React.DragEvent) => {
       event.preventDefault();
       setIsDragOver(false);
-      
-      const file = event.dataTransfer.files[0];
+
+      const files = event.dataTransfer.files;
+      if (files.length === 0) return;
+
+      const file = files[0];
       if (file) {
         const error = validateFile(file);
         if (error) {
@@ -129,9 +132,14 @@ const ImageToPrompt = forwardRef<ImageToPromptRef, ImageToPromptProps>(
           return;
         }
 
+        // Create a proper ChangeEvent-like object
         const fakeEvent = {
-          target: { files: [file] }
-        } as React.ChangeEvent<HTMLInputElement>;
+          target: { 
+            files: [file],
+            value: ''
+          },
+          currentTarget: { files: [file] }
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
         handleFileSelect(fakeEvent);
       }
     };

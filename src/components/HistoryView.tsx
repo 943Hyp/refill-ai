@@ -25,21 +25,21 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
   const t = (key: keyof typeof import('@/lib/i18n').translations.zh) => getTranslation(locale, key);
 
   useEffect(() => {
-    loadHistory();
-  }, []);
-
-  const loadHistory = async () => {
-    setIsLoading(true);
-    try {
-      const historyData = await getHistory();
-      setHistory(historyData);
-    } catch (error) {
-      console.error('Failed to load history:', error);
-      toast.error(locale === 'zh' ? '加载历史记录失败' : 'Failed to load history');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const loadHistoryData = async () => {
+      setIsLoading(true);
+      try {
+        const historyData = await getHistory();
+        setHistory(historyData);
+      } catch (error) {
+        console.error('Failed to load history:', error);
+        toast.error(locale === 'zh' ? '加载历史记录失败' : 'Failed to load history');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadHistoryData();
+  }, [locale]);
 
   const getFilterOptions = () => {
     if (filterBy === 'style') {
@@ -280,7 +280,7 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
             <div className="flex gap-2">
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'prompt')}
                 className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
                 <option value="newest">{locale === 'zh' ? '最新' : 'Newest'}</option>
@@ -290,7 +290,7 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
               <select
                 value={filterBy}
                 onChange={(e) => {
-                  setFilterBy(e.target.value as any);
+                  setFilterBy(e.target.value as 'all' | 'style' | 'quality' | 'aspect');
                   setSelectedFilter('all');
                 }}
                 className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
