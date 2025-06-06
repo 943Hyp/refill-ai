@@ -8,6 +8,8 @@ export async function generateImageWithReplicate(params: {
   aspectRatio?: string;
 }): Promise<{ imageUrl: string }> {
   try {
+    console.log('Calling Replicate API with params:', params);
+    
     const response = await fetch('/api/generate', {
       method: 'POST',
       headers: {
@@ -16,12 +18,16 @@ export async function generateImageWithReplicate(params: {
       body: JSON.stringify(params),
     });
 
+    console.log('API response status:', response.status);
+
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('API error response:', errorData);
       throw new Error(errorData.error || `HTTP ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('API success response:', data);
     return { imageUrl: data.imageUrl };
   } catch (error) {
     console.error('Replicate image generation error:', error);

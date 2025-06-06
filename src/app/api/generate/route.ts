@@ -53,6 +53,12 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查 API token 是否配置
+    console.log('Environment check:', {
+      hasEnvToken: !!process.env.REPLICATE_API_TOKEN,
+      envTokenLength: process.env.REPLICATE_API_TOKEN?.length,
+      envTokenPrefix: process.env.REPLICATE_API_TOKEN?.substring(0, 10)
+    });
+    
     if (!process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_TOKEN.trim() === '' || process.env.REPLICATE_API_TOKEN === 'XXXXXXXX') {
       console.error('Replicate API token not configured:', process.env.REPLICATE_API_TOKEN ? 'Token exists but invalid' : 'Token missing');
       return NextResponse.json(
