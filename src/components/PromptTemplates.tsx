@@ -377,3 +377,4 @@ const PromptTemplates = ({ setPrompt, setActiveTab, locale }: PromptTemplatesPro
 };
 
 export default PromptTemplates; 
+ 

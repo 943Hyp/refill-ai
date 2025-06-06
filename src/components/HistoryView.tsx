@@ -516,3 +516,4 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
 };
 
 export default HistoryView; 
+ 

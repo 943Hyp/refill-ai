@@ -61,10 +61,12 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   icons: {
     icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
       { url: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
       { url: '/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: [
+      { url: '/apple-touch-icon.svg', sizes: '180x180', type: 'image/svg+xml' },
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
@@ -111,6 +113,10 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#3b82f6" />
         <meta name="msapplication-tap-highlight" content="no" />
         
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="alternate icon" href="/favicon.ico" />
+        
         {/* Preconnect to external domains */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -147,7 +153,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} antialiased`}>
-        {children}
+          {children}
         
         {/* Service Worker Registration */}
         <script

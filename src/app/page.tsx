@@ -6,7 +6,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/sections/HeroSection';
 import FAQSection from '@/components/sections/FAQSection';
-import GallerySection from '@/components/sections/GallerySection';
+
 import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import TabsContainer from '@/components/TabsContainer';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
@@ -74,8 +74,7 @@ export default function Home() {
           </section>
         )}
 
-        {/* Gallery Section - 精选作品展览 */}
-        {!showApp && <GallerySection locale={locale} />}
+
 
         {/* Features Section - Only show when not in app mode */}
         {!showApp && (
@@ -169,6 +168,6 @@ export default function Home() {
           },
         }}
       />
-    </div>
+      </div>
   );
 }

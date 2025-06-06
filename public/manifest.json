@@ -1,16 +1,21 @@
 {
-  "name": "Refill AI - 免费AI图像生成平台",
+  "name": "Refill AI",
   "short_name": "Refill AI",
-  "description": "免费的AI图像生成平台，无需注册，即刻开始创作",
+  "description": "AI-powered image generation and analysis platform",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#3b82f6",
+  "theme_color": "#6366f1",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "zh-CN",
   "categories": ["productivity", "graphics", "utilities"],
   "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
     {
       "src": "/icon-192x192.png",
       "sizes": "192x192",

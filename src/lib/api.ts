@@ -174,7 +174,7 @@ class ApiClient {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         return await operation();
-      } catch (error) {
+  } catch (error) {
         lastError = error as Error;
         
         if (attempt === maxRetries) {
@@ -255,7 +255,7 @@ class ApiClient {
       // Simulate occasional failures
       if (Math.random() < 0.05) {
         throw new Error('Image analysis service temporarily unavailable');
-      }
+  }
       
       let prompt = '';
       
@@ -355,7 +355,7 @@ export async function saveToHistory(image: GeneratedImage): Promise<void> {
   }
   
   history.unshift(image);
-  
+
   // Keep only the latest 200 items
   const limitedHistory = history.slice(0, 200);
   
@@ -551,7 +551,7 @@ export function formatFileSize(bytes: number): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
+  }
 
 export function generateUniqueId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);

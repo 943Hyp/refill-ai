@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查 API token 是否配置
-    if (!process.env.REPLICATE_API_TOKEN) {
+    if (!process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_TOKEN.trim() === '' || process.env.REPLICATE_API_TOKEN === 'XXXXXXXX') {
+      console.error('Replicate API token not configured:', process.env.REPLICATE_API_TOKEN ? 'Token exists but invalid' : 'Token missing');
       return NextResponse.json(
         { error: 'Replicate API token not configured' },
         { status: 503 }

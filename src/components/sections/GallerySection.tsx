@@ -16,80 +16,209 @@ interface Artwork {
   style: string;
   likes: number;
   author: string;
+  height: number; // 用于瀑布流布局
 }
 
 const artworks: Artwork[] = [
   {
     id: '1',
-    imageUrl: 'https://images.unsplash.com/photo-1707344088547-3cf7cea5ca49?w=800&h=800&fit=crop',
-    title: '赛博朋克城市',
-    prompt: 'Cyberpunk city at night, neon lights, futuristic architecture, rain reflections',
+    imageUrl: 'https://picsum.photos/400/380?random=1',
+    title: '赛博朋克女战士',
+    prompt: 'Cyberpunk female warrior with neon blue armor, glowing circuits, futuristic cityscape background, dramatic lighting, ultra detailed 8K',
     style: 'Cyberpunk',
-    likes: 1247,
-    author: 'AI艺术家'
+    likes: 12847,
+    author: 'MidjourneyAI',
+    height: 380
   },
   {
     id: '2',
-    imageUrl: 'https://images.unsplash.com/photo-1682687220063-4742bd7fd538?w=800&h=800&fit=crop',
-    title: '梦幻森林',
-    prompt: 'Magical forest with glowing mushrooms, fairy lights, mystical atmosphere',
+    imageUrl: 'https://picsum.photos/400/460?random=2',
+    title: '魔法师召唤仪式',
+    prompt: 'Powerful wizard casting spell, purple magical energy, floating runes, mystical forest, ethereal atmosphere, fantasy art style',
     style: 'Fantasy',
-    likes: 892,
-    author: 'Dream Creator'
+    likes: 15623,
+    author: 'DALL-E 3',
+    height: 460
   },
   {
     id: '3',
-    imageUrl: 'https://images.unsplash.com/photo-1707343843437-caacff5cfa74?w=800&h=800&fit=crop',
-    title: '未来机器人',
-    prompt: 'Advanced humanoid robot, sleek design, glowing blue eyes, sci-fi',
-    style: '3D Render',
-    likes: 1456,
-    author: 'Tech Visionary'
+    imageUrl: 'https://picsum.photos/400/300?random=3',
+    title: '火星殖民基地',
+    prompt: 'Mars colony base with glass domes, red planet landscape, futuristic architecture, space exploration, sci-fi concept art',
+    style: 'Sci-Fi',
+    likes: 9834,
+    author: 'StableDiffusion',
+    height: 300
   },
   {
     id: '4',
-    imageUrl: 'https://images.unsplash.com/photo-1688891584219-6e753d5acef8?w=800&h=800&fit=crop',
-    title: '水彩花园',
-    prompt: 'Beautiful garden with colorful flowers, watercolor painting style, soft brushstrokes',
-    style: 'Watercolor',
-    likes: 734,
-    author: 'Art Lover'
+    imageUrl: 'https://picsum.photos/400/260?random=4',
+    title: '凤凰重生',
+    prompt: 'Majestic phoenix rising from golden flames, detailed feathers, fire effects, mythical creature, dramatic composition',
+    style: 'Mythical',
+    likes: 18234,
+    author: 'MidjourneyAI',
+    height: 260
   },
   {
     id: '5',
-    imageUrl: 'https://images.unsplash.com/photo-1682695796497-31a44224d6d6?w=800&h=800&fit=crop',
-    title: '太空探索',
-    prompt: 'Astronaut floating in space, Earth in background, cosmic nebula, photorealistic',
-    style: 'Photorealistic',
-    likes: 2103,
-    author: 'Space Explorer'
+    imageUrl: 'https://picsum.photos/400/360?random=5',
+    title: '机械天使',
+    prompt: 'Cybernetic angel with metallic wings, glowing blue circuits, heavenly light, fusion of divine and technology',
+    style: 'Cyberpunk',
+    likes: 14567,
+    author: 'DALL-E 3',
+    height: 360
   },
   {
     id: '6',
-    imageUrl: 'https://images.unsplash.com/photo-1707343843982-f8275f3994c5?w=800&h=800&fit=crop',
-    title: '动漫少女',
-    prompt: 'Anime girl with blue hair, cherry blossoms, spring atmosphere, detailed',
-    style: 'Anime',
-    likes: 1678,
-    author: 'Anime Fan'
+    imageUrl: 'https://picsum.photos/400/280?random=6',
+    title: '翡翠龙宫',
+    prompt: 'Underwater dragon palace with emerald crystals, bioluminescent coral, mystical sea creatures, fantasy underwater world',
+    style: 'Fantasy',
+    likes: 11456,
+    author: 'StableDiffusion',
+    height: 280
   },
   {
     id: '7',
-    imageUrl: 'https://images.unsplash.com/photo-1682687982183-c2937a37a21a?w=800&h=800&fit=crop',
-    title: '古典建筑',
-    prompt: 'Ancient Greek temple, marble columns, golden hour lighting, architectural photography',
-    style: 'Classical',
-    likes: 567,
-    author: 'History Buff'
+    imageUrl: 'https://picsum.photos/400/400?random=7',
+    title: '星云漫步者',
+    prompt: 'Astronaut floating in purple nebula, cosmic dust, distant galaxies, space exploration, photorealistic sci-fi art',
+    style: 'Space',
+    likes: 16789,
+    author: 'MidjourneyAI',
+    height: 400
   },
   {
     id: '8',
-    imageUrl: 'https://images.unsplash.com/photo-1688891584184-6ab9738bd13d?w=800&h=800&fit=crop',
-    title: '抽象艺术',
-    prompt: 'Abstract digital art, flowing colors, geometric patterns, modern design',
+    imageUrl: 'https://picsum.photos/400/240?random=8',
+    title: '黄金神殿守护者',
+    prompt: 'Ancient temple guardian statue, golden armor, mystical runes, divine light rays, epic fantasy architecture',
+    style: 'Fantasy',
+    likes: 8934,
+    author: 'DALL-E 3',
+    height: 240
+  },
+  {
+    id: '9',
+    imageUrl: 'https://picsum.photos/400/320?random=9',
+    title: '樱花武士',
+    prompt: 'Samurai warrior in pink armor, cherry blossom petals falling, katana sword, anime art style, dramatic pose',
+    style: 'Anime',
+    likes: 19876,
+    author: 'NovalAI',
+    height: 320
+  },
+  {
+    id: '10',
+    imageUrl: 'https://picsum.photos/400/300?random=10',
+    title: '蒸汽朋克飞艇',
+    prompt: 'Victorian steampunk airship with brass gears, copper pipes, steam engines, flying through cloudy skies',
+    style: 'Steampunk',
+    likes: 7623,
+    author: 'StableDiffusion',
+    height: 300
+  },
+  {
+    id: '11',
+    imageUrl: 'https://picsum.photos/400/420?random=11',
+    title: '霓虹都市猎人',
+    prompt: 'Neon-lit cyberpunk bounty hunter, purple and pink lighting, futuristic weapons, rain-soaked streets',
+    style: 'Cyberpunk',
+    likes: 13245,
+    author: 'MidjourneyAI',
+    height: 420
+  },
+  {
+    id: '12',
+    imageUrl: 'https://picsum.photos/400/260?random=12',
+    title: '森林精灵',
+    prompt: 'Ethereal forest elf with glowing green eyes, nature magic, luminescent flowers, mystical woodland setting',
+    style: 'Fantasy',
+    likes: 10567,
+    author: 'DALL-E 3',
+    height: 260
+  },
+  {
+    id: '13',
+    imageUrl: 'https://picsum.photos/400/360?random=13',
+    title: '冰霜法师',
+    prompt: 'Ice mage with crystal staff, frozen magic effects, blue and white palette, detailed robes, winter landscape',
+    style: 'Fantasy',
+    likes: 12890,
+    author: 'StableDiffusion',
+    height: 360
+  },
+  {
+    id: '14',
+    imageUrl: 'https://picsum.photos/400/280?random=14',
+    title: '烈焰战神',
+    prompt: 'Fire warrior god with flaming sword, molten armor, volcanic background, epic battle scene, divine power',
+    style: 'Mythical',
+    likes: 17234,
+    author: 'MidjourneyAI',
+    height: 280
+  },
+  {
+    id: '15',
+    imageUrl: 'https://picsum.photos/400/380?random=15',
+    title: '量子实验室',
+    prompt: 'Futuristic quantum physics laboratory, holographic displays, energy particles, scientific equipment, neon lighting',
+    style: 'Sci-Fi',
+    likes: 8765,
+    author: 'DALL-E 3',
+    height: 380
+  },
+  {
+    id: '16',
+    imageUrl: 'https://picsum.photos/400/240?random=16',
+    title: '梦境花园',
+    prompt: 'Surreal dream garden with floating flowers, pastel colors, dreamy atmosphere, soft lighting, whimsical design',
+    style: 'Surreal',
+    likes: 9456,
+    author: 'StableDiffusion',
+    height: 240
+  },
+  {
+    id: '17',
+    imageUrl: 'https://picsum.photos/400/320?random=17',
+    title: '数字女神',
+    prompt: 'Digital goddess with holographic dress, data streams, virtual reality, cybernetic beauty, futuristic portrait',
     style: 'Digital Art',
-    likes: 923,
-    author: 'Digital Artist'
+    likes: 15678,
+    author: 'MidjourneyAI',
+    height: 320
+  },
+  {
+    id: '18',
+    imageUrl: 'https://picsum.photos/400/300?random=18',
+    title: '水晶龙',
+    prompt: 'Majestic crystal dragon with transparent scales, rainbow reflections, magical cave, fantasy creature art',
+    style: 'Fantasy',
+    likes: 14123,
+    author: 'DALL-E 3',
+    height: 300
+  },
+  {
+    id: '19',
+    imageUrl: 'https://picsum.photos/400/420?random=19',
+    title: '沙漠机甲',
+    prompt: 'Giant desert mecha warrior, sand storm, post-apocalyptic landscape, detailed mechanical design, epic scale',
+    style: 'Mecha',
+    likes: 11789,
+    author: 'StableDiffusion',
+    height: 420
+  },
+  {
+    id: '20',
+    imageUrl: 'https://picsum.photos/400/360?random=20',
+    title: '时空旅行者',
+    prompt: 'Time traveler with glowing portal, swirling energy, multiple dimensions, sci-fi concept, dramatic lighting',
+    style: 'Sci-Fi',
+    likes: 16234,
+    author: 'MidjourneyAI',
+    height: 360
   }
 ];
 
@@ -191,31 +320,29 @@ export default function GallerySection({ locale }: GallerySectionProps) {
           </p>
         </motion.div>
 
+        {/* 瀑布流布局 */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
         >
           {artworks.map((artwork, index) => (
             <motion.div
               key={artwork.id}
               variants={itemVariants}
               whileHover={{ 
-                scale: 1.05,
-                rotateY: 5,
-                z: 50
+                scale: 1.02,
+                y: -5
               }}
-              whileTap={{ scale: 0.95 }}
-              className="group relative bg-card/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 transition-all duration-500 cursor-pointer"
-              style={{
-                transformStyle: 'preserve-3d'
-              }}
+              whileTap={{ scale: 0.98 }}
+              className="group relative bg-card/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 transition-all duration-500 cursor-pointer break-inside-avoid mb-6"
+              style={{ height: `${artwork.height}px` }}
               onClick={() => setSelectedArtwork(artwork)}
             >
               {/* 图片容器 */}
-              <div className="relative aspect-square overflow-hidden">
+              <div className="relative w-full h-full overflow-hidden">
                 <motion.img
                   src={artwork.imageUrl}
                   alt={artwork.title}
@@ -227,44 +354,39 @@ export default function GallerySection({ locale }: GallerySectionProps) {
                 <motion.div
                   initial={{ opacity: 0 }}
                   whileHover={{ opacity: 1 }}
-                  className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-4"
+                  className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-4"
                 >
+                  {/* 顶部信息 */}
+                  <div className="flex justify-between items-start">
+                    <span className="px-2 py-1 bg-primary/90 text-primary-foreground text-xs font-medium rounded-full backdrop-blur-sm">
+                      {artwork.style}
+                    </span>
+                    <div className="flex items-center gap-1 bg-black/50 backdrop-blur-sm rounded-full px-2 py-1">
+                      <span className="text-red-400">❤️</span>
+                      <span className="text-white text-xs font-medium">{artwork.likes.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  {/* 底部信息 */}
                   <div className="text-white">
                     <h3 className="font-semibold text-lg mb-1">{artwork.title}</h3>
-                    <p className="text-sm opacity-90 line-clamp-2">{artwork.prompt}</p>
+                    <p className="text-sm opacity-90 line-clamp-2 mb-2">{artwork.prompt}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs opacity-80">{artwork.author}</span>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="text-white hover:text-primary transition-colors"
+                      >
+                        <span className="text-lg">🔍</span>
+                      </motion.button>
+                    </div>
                   </div>
                 </motion.div>
 
-                {/* 风格标签 */}
-                <div className="absolute top-3 left-3">
-                  <span className="px-2 py-1 bg-primary/90 text-primary-foreground text-xs font-medium rounded-full backdrop-blur-sm">
-                    {artwork.style}
-                  </span>
-                </div>
-
-                {/* 点赞数 */}
-                <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/50 backdrop-blur-sm rounded-full px-2 py-1">
-                  <span className="text-red-400">❤️</span>
-                  <span className="text-white text-xs font-medium">{artwork.likes}</span>
-                </div>
+                {/* 3D 边框效果 */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 via-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               </div>
-
-              {/* 作品信息 */}
-              <div className="p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">{artwork.author}</span>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="text-primary hover:text-primary/80 transition-colors"
-                  >
-                    <span className="text-lg">🔍</span>
-                  </motion.button>
-                </div>
-              </div>
-
-              {/* 3D 边框效果 */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 via-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             </motion.div>
           ))}
         </motion.div>
@@ -275,7 +397,7 @@ export default function GallerySection({ locale }: GallerySectionProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="text-center mt-12"
+          className="text-center mt-16"
         >
           <motion.button
             whileHover={{ 
@@ -285,7 +407,7 @@ export default function GallerySection({ locale }: GallerySectionProps) {
             whileTap={{ scale: 0.95 }}
             className="px-8 py-3 bg-gradient-to-r from-primary to-purple-600 text-primary-foreground font-semibold rounded-full hover:shadow-lg transition-all duration-300"
           >
-            {locale === 'zh' ? '查看更多作品 →' : 'View More Artworks →'}
+            {locale === 'zh' ? '开始创作您的作品 →' : 'Start Creating Your Art →'}
           </motion.button>
         </motion.div>
       </div>
@@ -320,7 +442,7 @@ export default function GallerySection({ locale }: GallerySectionProps) {
               <img
                 src={selectedArtwork.imageUrl}
                 alt={selectedArtwork.title}
-                className="w-full aspect-square object-cover rounded-xl mb-4"
+                className="w-full aspect-auto object-cover rounded-xl mb-4"
               />
               
               <div className="space-y-3">
@@ -332,7 +454,7 @@ export default function GallerySection({ locale }: GallerySectionProps) {
                   <span className="text-sm text-muted-foreground">{locale === 'zh' ? '作者：' : 'Author: '}{selectedArtwork.author}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-red-400">❤️</span>
-                    <span>{selectedArtwork.likes}</span>
+                    <span>{selectedArtwork.likes.toLocaleString()}</span>
                   </div>
                 </div>
               </div>

@@ -118,12 +118,12 @@ export default function TestimonialsSection({ locale }: TestimonialsSectionProps
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // 自动滚动
+  // 自动滚动 - 更平滑的过渡
   useEffect(() => {
     if (!isHovered) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-      }, 4000);
+      }, 5000); // 增加间隔时间，让用户有更多时间阅读
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -238,33 +238,29 @@ export default function TestimonialsSection({ locale }: TestimonialsSectionProps
               {getVisibleTestimonials().map((testimonial, index) => (
                 <motion.div
                   key={`${testimonial.id}-${currentIndex}`}
-                  initial={{ opacity: 0, y: 50, rotateX: -15 }}
+                  initial={{ opacity: 0, x: 100, scale: 0.8 }}
                   animate={{ 
                     opacity: 1, 
-                    y: 0, 
-                    rotateX: 0,
+                    x: 0, 
                     scale: index === 1 ? 1.05 : 1 // 中间卡片稍大
                   }}
-                  exit={{ opacity: 0, y: -50, rotateX: 15 }}
+                  exit={{ opacity: 0, x: -100, scale: 0.8 }}
                   transition={{ 
-                    duration: 0.6,
-                    delay: index * 0.1,
+                    duration: 0.8,
+                    delay: index * 0.05,
                     type: "spring",
-                    stiffness: 100
+                    stiffness: 80,
+                    damping: 20
                   }}
                   whileHover={{ 
-                    scale: 1.08,
-                    rotateY: 5,
-                    z: 50
+                    scale: 1.03,
+                    y: -5
                   }}
                   className={`
                     relative bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border/50 
-                    hover:border-primary/50 transition-all duration-500 cursor-pointer
+                    hover:border-primary/50 transition-all duration-300 cursor-pointer
                     ${index === 1 ? 'ring-2 ring-primary/20' : ''}
                   `}
-                  style={{
-                    transformStyle: 'preserve-3d'
-                  }}
                 >
                   {/* 平台标签 */}
                   <div className="absolute top-4 right-4">
@@ -313,19 +309,27 @@ export default function TestimonialsSection({ locale }: TestimonialsSectionProps
           </motion.div>
 
           {/* 进度指示器 */}
-          <div className="flex justify-center mt-8 gap-2">
+          <div className="flex justify-center mt-8 gap-3">
             {testimonials.map((_, index) => (
               <motion.button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`relative w-12 h-1 rounded-full transition-all duration-500 ${
                   index === currentIndex 
-                    ? 'bg-primary scale-125' 
+                    ? 'bg-primary' 
                     : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
                 }`}
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.9 }}
-              />
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {index === currentIndex && (
+                  <motion.div
+                    className="absolute inset-0 bg-primary rounded-full"
+                    layoutId="activeIndicator"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+              </motion.button>
             ))}
           </div>
         </div>
