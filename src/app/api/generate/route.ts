@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Replicate from 'replicate';
 
-// 正确初始化 Replicate，让它自动从环境变量读取 API Token
+// 使用环境变量或默认值
 const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
+  auth: process.env.REPLICATE_API_TOKEN || 'your-replicate-api-token-here',
 });
 
 // FLUX SCHNELL 是目前最先进的开源文生图模型之一
@@ -52,20 +52,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 检查 API token 是否配置
-    console.log('Environment check:', {
-      hasEnvToken: !!process.env.REPLICATE_API_TOKEN,
-      envTokenLength: process.env.REPLICATE_API_TOKEN?.length,
-      envTokenPrefix: process.env.REPLICATE_API_TOKEN?.substring(0, 10)
-    });
-    
-    if (!process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_TOKEN.trim() === '' || process.env.REPLICATE_API_TOKEN === 'XXXXXXXX') {
-      console.error('Replicate API token not configured:', process.env.REPLICATE_API_TOKEN ? 'Token exists but invalid' : 'Token missing');
-      return NextResponse.json(
-        { error: 'Replicate API token not configured' },
-        { status: 503 }
-      );
-    }
+    console.log('🎨 Starting image generation with FLUX SCHNELL:', { prompt, style, quality, aspectRatio });
 
     console.log('Generating image with FLUX SCHNELL:', { prompt, style, quality, aspectRatio });
 
