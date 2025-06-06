@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Replicate from 'replicate';
 
-// 使用环境变量或默认值
+// 使用环境变量中的API密钥
 const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN || 'your-replicate-api-token-here',
+  auth: process.env.REPLICATE_API_TOKEN,
 });
 
 // FLUX SCHNELL 是目前最先进的开源文生图模型之一
