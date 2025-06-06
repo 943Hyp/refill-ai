@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ImageGenerator from '@/components/ImageGenerator';
 import ImageToPrompt from '@/components/ImageToPrompt';
 import HistoryView from '@/components/HistoryView';
-import PromptTemplates from '@/components/PromptTemplates';
 import UsageLimitsInfo from '@/components/UsageLimitsInfo';
 import { Locale, getTranslation } from '@/lib/i18n';
 
@@ -63,11 +62,6 @@ const TabsContainer = forwardRef<TabsContainerRef, TabsContainerProps>(
         icon: '🔍'
       },
       {
-        id: 'templates',
-        label: locale === 'zh' ? '模板' : 'Templates', 
-        icon: '📝'
-      },
-      {
         id: 'history',
         label: locale === 'zh' ? '历史' : 'History',
         icon: '📚'
@@ -78,7 +72,7 @@ const TabsContainer = forwardRef<TabsContainerRef, TabsContainerProps>(
       <div className="w-full max-w-6xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Tab Navigation */}
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-8 bg-muted/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 mb-8 bg-muted/50 backdrop-blur-sm">
             {tabs.map((tab) => (
               <TabsTrigger 
                 key={tab.id}
@@ -106,21 +100,6 @@ const TabsContainer = forwardRef<TabsContainerRef, TabsContainerProps>(
               <ImageToPrompt 
                 ref={imageToPromptRef}
                 locale={locale} 
-              />
-            </TabsContent>
-
-            <TabsContent value="templates" className="mt-0">
-              <PromptTemplates 
-                locale={locale}
-                setPrompt={(prompt) => {
-                  // Switch to generate tab and set the prompt
-                  setActiveTab('generate');
-                  // Pass the prompt to ImageGenerator
-                  if (imageGeneratorRef.current) {
-                    imageGeneratorRef.current.setPrompt(prompt);
-                  }
-                }}
-                setActiveTab={setActiveTab}
               />
             </TabsContent>
 

@@ -14,7 +14,6 @@ export const translations = {
     // Tabs
     textToImage: '文生图',
     imageToText: '图生文',
-    templates: '模板',
     history: '历史',
     
     // Image Generator
@@ -38,13 +37,6 @@ export const translations = {
     editPrompt: '✏️ 编辑',
     usePrompt: '🎨 用此提示词生成图像',
     
-    // Templates
-    promptTemplates: '提示词模板',
-    templatesDescription: '选择预设模板快速开始创作，或获取灵感',
-    searchTemplates: '搜索模板...',
-    useTemplate: '✨ 使用',
-    copyTemplate: '📋 复制',
-    
     // History
     generationHistory: '生成历史',
     noHistory: '暂无历史记录',
@@ -59,7 +51,6 @@ export const translations = {
     imageCopied: '图像已复制',
     imageDownloaded: '图像下载成功',
     promptApplied: '提示词已应用到生成器',
-    templateApplied: '已应用模板',
     
     // Errors
     enterPrompt: '请先输入提示词',
@@ -81,7 +72,6 @@ export const translations = {
     // Tabs
     textToImage: 'Text to Image',
     imageToText: 'Image to Text',
-    templates: 'Templates',
     history: 'History',
     
     // Image Generator
@@ -105,13 +95,6 @@ export const translations = {
     editPrompt: '✏️ Edit',
     usePrompt: '🎨 Generate Image From This Prompt',
     
-    // Templates
-    promptTemplates: 'Prompt Templates',
-    templatesDescription: 'Choose preset templates to start creating quickly, or get inspiration',
-    searchTemplates: 'Search templates...',
-    useTemplate: '✨ Use',
-    copyTemplate: '📋 Copy',
-    
     // History
     generationHistory: 'Generation History',
     noHistory: 'No History Yet',
@@ -126,7 +109,6 @@ export const translations = {
     imageCopied: 'Image copied',
     imageDownloaded: 'Image downloaded successfully',
     promptApplied: 'Prompt applied to generator',
-    templateApplied: 'Template applied',
     
     // Errors
     enterPrompt: 'Please enter a prompt first',
