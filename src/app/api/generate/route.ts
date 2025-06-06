@@ -95,8 +95,15 @@ export async function POST(request: NextRequest) {
       if (Array.isArray(output) && output.length > 0) {
         imageUrl = output[0] as string;
       } else {
+        console.error('Unexpected FLUX SCHNELL output:', output);
         throw new Error('Unexpected output format from FLUX SCHNELL');
       }
+
+      console.log('FLUX SCHNELL generation successful:', {
+        imageUrl: imageUrl.substring(0, 100) + '...',
+        model: 'FLUX SCHNELL',
+        prompt: enhancedPrompt.substring(0, 100) + '...'
+      });
 
       return NextResponse.json({ 
         imageUrl,

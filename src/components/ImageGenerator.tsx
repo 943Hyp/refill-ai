@@ -31,6 +31,15 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
     const [estimatedTime, setEstimatedTime] = useState(0);
     const [usageInfo, setUsageInfo] = useState<{ count: number; nextCooldown?: string }>({ count: 0 });
     const [rateLimitInfo, setRateLimitInfo] = useState<{ waitTime?: number; message?: string } | null>(null);
+    const [debugInfo, setDebugInfo] = useState<{
+      timestamp: string;
+      result: { imageUrl: string; model?: string; enhancedPrompt?: string };
+      prompt: string;
+      style: string;
+      quality: string;
+      aspectRatio: string;
+    } | null>(null);
+    const [showDebug, setShowDebug] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const t = (key: keyof typeof import('@/lib/i18n').translations.zh) => getTranslation(locale, key);
@@ -197,6 +206,33 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
 
         clearInterval(progressInterval);
         setGenerationProgress(100);
+        
+        // 增强调试信息
+        console.log('Generation result:', result);
+        setDebugInfo({
+          timestamp: new Date().toISOString(),
+          result,
+          prompt,
+          style: selectedStyle,
+          quality: selectedQuality,
+          aspectRatio: selectedAspect
+        });
+        
+        if (!result.imageUrl) {
+          throw new Error('No image URL returned from API');
+        }
+        
+        // 验证图像URL是否可访问
+        try {
+          const imageResponse = await fetch(result.imageUrl, { method: 'HEAD' });
+          if (!imageResponse.ok) {
+            throw new Error(`Image URL not accessible: ${imageResponse.status}`);
+          }
+        } catch (urlError) {
+          console.warn('Image URL validation failed:', urlError);
+          // 继续尝试显示，可能是CORS问题
+        }
+        
         setGeneratedImage(result.imageUrl);
         
         // Save to history
@@ -351,7 +387,28 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                 <span className="mr-1">🎲</span>
                 {t('random')}
               </Button>
+              
+              {/* 调试按钮 */}
+              <Button
+                onClick={() => setShowDebug(!showDebug)}
+                variant="outline"
+                size="sm"
+                className="text-xs"
+              >
+                <span className="mr-1">🔧</span>
+                调试
+              </Button>
             </div>
+            
+            {/* 调试面板 */}
+            {showDebug && debugInfo && (
+              <div className="bg-muted/20 border border-muted rounded-lg p-3 text-xs">
+                <div className="font-medium mb-2">调试信息:</div>
+                <pre className="whitespace-pre-wrap overflow-auto max-h-40">
+                  {JSON.stringify(debugInfo, null, 2)}
+                </pre>
+              </div>
+            )}
           </div>
 
           {/* Style Options */}
@@ -500,8 +557,21 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                   alt="Generated"
                   className="w-full rounded-lg border border-border shadow-lg"
                   loading="lazy"
+                  onLoad={() => {
+                    console.log('Image loaded successfully:', generatedImage);
+                    toast.success(locale === 'zh' ? '图像加载完成！' : 'Image loaded successfully!');
+                  }}
+                  onError={(e) => {
+                    console.error('Image load error:', e, 'URL:', generatedImage);
+                    toast.error(locale === 'zh' ? '图像加载失败，请重试' : 'Image failed to load, please retry');
+                  }}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg"></div>
+                
+                {/* 显示图像URL用于调试 */}
+                <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                  {generatedImage.substring(0, 50)}...
+                </div>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button onClick={downloadImage} variant="outline" size="sm" className="flex-1 sm:flex-none">
