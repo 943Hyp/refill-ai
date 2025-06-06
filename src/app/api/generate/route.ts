@@ -42,10 +42,29 @@ function enhancePromptForStyle(prompt: string, style?: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔍 API Route called - checking environment...');
+    
+    // 检查API密钥
+    const apiToken = process.env.REPLICATE_API_TOKEN;
+    console.log('API Token check:', {
+      hasEnvToken: !!process.env.REPLICATE_API_TOKEN,
+      tokenLength: apiToken?.length,
+      tokenPrefix: apiToken?.substring(0, 8)
+    });
+
+    if (!apiToken) {
+      console.log('❌ Replicate API token not configured');
+      return NextResponse.json(
+        { error: 'Replicate API token not configured: Token missing' },
+        { status: 503 }
+      );
+    }
+
     const { prompt, style, quality, aspectRatio } = await request.json();
 
     // 验证必需字段
     if (!prompt) {
+      console.log('❌ Missing prompt');
       return NextResponse.json(
         { error: 'Prompt is required' },
         { status: 400 }
@@ -72,6 +91,10 @@ export async function POST(request: NextRequest) {
 
     try {
       // 首先尝试使用 FLUX SCHNELL 模型
+      console.log('🚀 Calling Replicate API with model:', FLUX_SCHNELL_MODEL);
+      console.log('📝 Enhanced prompt:', enhancedPrompt);
+      console.log('⚙️ Parameters:', { fluxAspectRatio, quality });
+      
       const output = await replicate.run(FLUX_SCHNELL_MODEL as `${string}/${string}`, {
         input: {
           prompt: enhancedPrompt,
@@ -151,12 +174,17 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Image generation error:', error);
+    console.error('❌ Image generation error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('Error type:', typeof error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     
     return NextResponse.json(
       { 
         error: 'Image generation failed',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
+        type: typeof error,
+        stack: error instanceof Error ? error.stack : undefined
       },
       { status: 500 }
     );
