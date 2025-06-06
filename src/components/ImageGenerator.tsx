@@ -246,7 +246,18 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
           aspectRatio: selectedAspect,
         });
 
-        toast.success(locale === 'zh' ? '图像生成成功！' : 'Image generated successfully!');
+        toast.success(locale === 'zh' ? '图像生成成功！请向下滚动查看生成的图片' : 'Image generated successfully! Scroll down to view the generated image');
+        
+        // 自动滚动到生成的图片位置
+        setTimeout(() => {
+          const imageElement = document.querySelector('[data-generated-image]');
+          if (imageElement) {
+            imageElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }
+        }, 500);
         setRetryCount(0);
         
         // Update usage info after successful generation
@@ -512,6 +523,20 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
               )}
             </Button>
             
+            {/* 生成提示信息 */}
+            {!generatedImage && (
+              <div className="text-center text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg border border-dashed border-muted-foreground/30">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <span>👇</span>
+                  <span>{locale === 'zh' ? '生成的图片将显示在下方' : 'Generated image will appear below'}</span>
+                  <span>👇</span>
+                </div>
+                <div className="text-xs opacity-70">
+                  {locale === 'zh' ? '点击生成按钮后，图片会自动滚动到视图中' : 'After clicking generate, the image will automatically scroll into view'}
+                </div>
+              </div>
+            )}
+            
             {/* Retry Button */}
             {retryCount > 0 && retryCount < 3 && !isGenerating && (
               <Button
@@ -545,17 +570,48 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                   {locale === 'zh' ? '请稍候...' : 'Please wait...'}
                 </span>
               </div>
+              
+              {/* 生成中的占位区域 */}
+              <div className="mt-6 p-8 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl border-2 border-dashed border-primary/30 text-center">
+                <div className="animate-pulse space-y-4">
+                  <div className="w-16 h-16 bg-primary/20 rounded-full mx-auto flex items-center justify-center">
+                    <span className="text-2xl animate-spin">🎨</span>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-medium text-primary">
+                      {locale === 'zh' ? '正在生成您的图片...' : 'Generating your image...'}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {locale === 'zh' ? '图片将在此处显示' : 'Image will appear here'}
+                    </p>
+                  </div>
+                  <div className="flex justify-center space-x-1">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Generated Image */}
+          {/* Generated Image - Enhanced with better visibility */}
           {generatedImage && (
-            <div className="space-y-4">
+            <div className="space-y-4 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/20 shadow-lg" data-generated-image>
+              {/* 明显的标题提示 */}
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <h3 className="text-lg font-semibold text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  {locale === 'zh' ? '🎨 生成的图片' : '🎨 Generated Image'}
+                </h3>
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              </div>
+              
               <div className="relative group">
                 <img
                   src={generatedImage}
                   alt="Generated"
-                  className="w-full rounded-lg border border-border shadow-lg"
+                  className="w-full rounded-lg border-2 border-primary/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
                   loading="lazy"
                   onLoad={() => {
                     console.log('Image loaded successfully:', generatedImage);
@@ -566,6 +622,12 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                     toast.error(locale === 'zh' ? '图像加载失败，请重试' : 'Image failed to load, please retry');
                   }}
                 />
+                
+                {/* 新增：成功生成的动画效果 */}
+                <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow-lg animate-bounce">
+                  ✨ {locale === 'zh' ? '新生成' : 'New'}
+                </div>
+                
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg"></div>
                 
                 {/* 显示图像URL用于调试 */}
