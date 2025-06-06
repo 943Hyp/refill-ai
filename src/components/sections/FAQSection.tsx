@@ -42,7 +42,7 @@ const FAQSection = ({ locale }: FAQSectionProps) => {
     },
     {
       question: "如何写出更好的提示词？",
-      answer: "我们提供了丰富的提示词模板和优化建议。建议使用具体、详细的描述，包含风格、颜色、构图等元素。您也可以参考我们的模板库快速开始。"
+      answer: "我们建议使用具体、详细的描述，包含风格、颜色、构图等元素。提示词越详细，生成的图像就越符合您的期望。您也可以尝试不同的关键词组合来获取最佳效果。"
     },
     {
       question: "数据会被保存吗？",
@@ -83,7 +83,7 @@ const FAQSection = ({ locale }: FAQSectionProps) => {
     },
     {
       question: "How to write better prompts?",
-      answer: "We provide rich prompt templates and optimization suggestions. We recommend using specific, detailed descriptions including style, color, composition, and other elements. You can also refer to our template library to get started quickly."
+      answer: "We recommend using specific, detailed descriptions including style, color, composition, and other elements. The more detailed your prompt is, the better your generated image will match your expectations. You can also try different keyword combinations for best results."
     },
     {
       question: "Will my data be saved?",

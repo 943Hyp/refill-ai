@@ -23,11 +23,6 @@ const HeroSection = ({ locale, onGetStarted }: HeroSectionProps) => {
       desc: locale === 'zh' ? "图像转文字，智能识别" : "Image to text, smart recognition"
     },
     {
-      icon: "📝",
-      title: locale === 'zh' ? "提示词模板" : "Prompt Templates", 
-      desc: locale === 'zh' ? "精选模板，快速上手" : "Curated templates, quick start"
-    },
-    {
       icon: "🆓",
       title: locale === 'zh' ? "完全免费" : "Completely Free",
       desc: locale === 'zh' ? "无需登录，无限使用" : "No login required, unlimited use"
@@ -96,7 +91,7 @@ const HeroSection = ({ locale, onGetStarted }: HeroSectionProps) => {
         </div>
 
         {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
           {features.map((feature, index) => (
             <div 
               key={index}

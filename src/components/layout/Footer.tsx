@@ -16,7 +16,6 @@ const Footer = ({ locale }: FooterProps) => {
       links: [
         { name: locale === 'zh' ? 'AI图像生成' : 'AI Image Generation', href: '#generate' },
         { name: locale === 'zh' ? '图像分析' : 'Image Analysis', href: '#analyze' },
-        { name: locale === 'zh' ? '提示词模板' : 'Prompt Templates', href: '#templates' },
         { name: locale === 'zh' ? '历史记录' : 'History', href: '#history' }
       ]
     },

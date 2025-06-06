@@ -39,9 +39,6 @@ const Header = ({ locale, onLocaleChange }: HeaderProps) => {
             <a href="#analyze" className="text-sm font-medium hover:text-primary transition-colors">
               {locale === 'zh' ? '图像分析' : 'Analyze'}
             </a>
-            <a href="#templates" className="text-sm font-medium hover:text-primary transition-colors">
-              {locale === 'zh' ? '模板' : 'Templates'}
-            </a>
             <a href="#history" className="text-sm font-medium hover:text-primary transition-colors">
               {locale === 'zh' ? '历史' : 'History'}
             </a>
@@ -106,9 +103,6 @@ const Header = ({ locale, onLocaleChange }: HeaderProps) => {
               </a>
               <a href="#analyze" className="font-medium hover:text-primary transition-colors">
                 {locale === 'zh' ? '图像分析' : 'Analyze'}
-              </a>
-              <a href="#templates" className="font-medium hover:text-primary transition-colors">
-                {locale === 'zh' ? '模板' : 'Templates'}
               </a>
               <a href="#history" className="font-medium hover:text-primary transition-colors">
                 {locale === 'zh' ? '历史' : 'History'}

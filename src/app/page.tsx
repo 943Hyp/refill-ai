@@ -107,11 +107,6 @@ export default function Home() {
                     desc: locale === 'zh' ? "上传图片，AI自动生成详细的文字描述" : "Upload images and AI automatically generates detailed text descriptions"
                   },
                   {
-                    icon: "📝",
-                    title: locale === 'zh' ? "提示词模板" : "Prompt Templates",
-                    desc: locale === 'zh' ? "丰富的预设模板，帮助您快速创建专业提示词" : "Rich preset templates to help you quickly create professional prompts"
-                  },
-                  {
                     icon: "📱",
                     title: locale === 'zh' ? "响应式设计" : "Responsive Design",
                     desc: locale === 'zh' ? "完美适配各种设备，随时随地创作" : "Perfect adaptation to various devices, create anytime, anywhere"
