@@ -15,6 +15,89 @@ const BACKUP_MODELS = {
   anime: 'cjwbw/anything-v3.0:09a5805203f4c12da649ec1923bb7729517ca25fcac790e640eaa9ed66573b65',
 };
 
+// 基本动物翻译词典，确保中文关键词被识别
+const animalKeywords: Record<string, string> = {
+  '猫': 'cat',
+  '小猫': 'kitten',
+  '狗': 'dog',
+  '小狗': 'puppy',
+  '鱼': 'fish',
+  '鸟': 'bird',
+  '熊': 'bear',
+  '老虎': 'tiger',
+  '狮子': 'lion',
+  '大象': 'elephant',
+  '长颈鹿': 'giraffe',
+  '兔子': 'rabbit',
+  '松鼠': 'squirrel',
+  '猴子': 'monkey',
+  '熊猫': 'panda',
+  '鹿': 'deer',
+  '蝴蝶': 'butterfly',
+  '鲸鱼': 'whale',
+  '海豚': 'dolphin',
+  '鲨鱼': 'shark',
+  '青蛙': 'frog',
+  '蛇': 'snake',
+  '龙': 'dragon'
+};
+
+// 翻译常见的中文描述词
+const attributeKeywords: Record<string, string> = {
+  '可爱': 'cute',
+  '美丽': 'beautiful',
+  '漂亮': 'pretty',
+  '帅气': 'handsome',
+  '可怕': 'scary',
+  '恐怖': 'terrifying',
+  '大': 'big',
+  '小': 'small',
+  '高': 'tall',
+  '矮': 'short',
+  '胖': 'fat',
+  '瘦': 'thin',
+  '年轻': 'young',
+  '老': 'old',
+  '快乐': 'happy',
+  '悲伤': 'sad',
+  '生气': 'angry',
+  '惊讶': 'surprised',
+  '害怕': 'scared',
+  '勇敢': 'brave',
+  '强壮': 'strong',
+  '弱': 'weak',
+  '聪明': 'smart',
+  '愚蠢': 'stupid',
+  '红色': 'red',
+  '蓝色': 'blue',
+  '绿色': 'green',
+  '黄色': 'yellow',
+  '紫色': 'purple',
+  '粉色': 'pink',
+  '黑色': 'black',
+  '白色': 'white',
+  '吃': 'eating',
+  '喝': 'drinking',
+  '睡觉': 'sleeping',
+  '跑': 'running',
+  '跳': 'jumping',
+  '玩': 'playing',
+  '游泳': 'swimming',
+  '飞': 'flying'
+};
+
+// 动作描述词典
+const actionKeywords: Record<string, string> = {
+  '在吃': 'eating',
+  '在喝': 'drinking',
+  '在睡': 'sleeping',
+  '在跑': 'running',
+  '在跳': 'jumping',
+  '在玩': 'playing',
+  '在游泳': 'swimming',
+  '在飞': 'flying'
+};
+
 function enhancePromptForStyle(prompt: string, style?: string): string {
   const styleEnhancements = {
     'digital-art': ', digital art style',
@@ -28,17 +111,59 @@ function enhancePromptForStyle(prompt: string, style?: string): string {
     'fantasy': ', fantasy art style',
   };
 
-  let enhancedPrompt = prompt;
+  // 添加中文关键词识别和翻译
+  // 例如："一只可爱的小猫在吃鱼" -> "a cute kitten eating fish"
+  let translatedPrompt = prompt;
+  
+  // 检查是否是中文提示词
+  const hasChinese = /[\u4e00-\u9fa5]/.test(prompt);
+  
+  if (hasChinese) {
+    console.log('🇨🇳 检测到中文提示词，进行关键词强化...');
+    
+    // 应用中文关键词翻译
+    let enhancedChinese = prompt;
+    
+    // 添加英文前缀以确保模型理解
+    let englishPrompt = "";
+    
+    // 检查是否包含动物关键词
+    Object.entries(animalKeywords).forEach(([chinese, english]) => {
+      if (prompt.includes(chinese)) {
+        englishPrompt += english + " ";
+      }
+    });
+    
+    // 检查是否包含描述词
+    Object.entries(attributeKeywords).forEach(([chinese, english]) => {
+      if (prompt.includes(chinese)) {
+        englishPrompt += english + " ";
+      }
+    });
+    
+    // 检查是否包含动作词
+    Object.entries(actionKeywords).forEach(([chinese, english]) => {
+      if (prompt.includes(chinese)) {
+        englishPrompt += english + " ";
+      }
+    });
+    
+    // 如果发现了关键词，添加到原始提示词
+    if (englishPrompt.length > 0) {
+      translatedPrompt = `${prompt} (${englishPrompt.trim()})`;
+      console.log('🔄 增强后的提示词:', translatedPrompt);
+    }
+  }
   
   // 只在有明确风格选择时才添加风格词
   if (style && style !== 'none' && styleEnhancements[style as keyof typeof styleEnhancements]) {
-    enhancedPrompt += styleEnhancements[style as keyof typeof styleEnhancements];
+    translatedPrompt += styleEnhancements[style as keyof typeof styleEnhancements];
   }
   
   // 只添加基本的质量词，避免过度影响内容
-  enhancedPrompt += ', high quality';
+  translatedPrompt += ', high quality';
   
-  return enhancedPrompt;
+  return translatedPrompt;
 }
 
 export async function POST(request: NextRequest) {
