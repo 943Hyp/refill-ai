@@ -1,4 +1,31 @@
-# Refill AI - 免费AI图像生成平台
+# Refill AI - AI图像生成平台
+
+基于Next.js和Replicate API的现代化AI图像生成网站。
+
+## 功能特性
+
+- 🎨 AI文生图功能（使用FLUX SCHNELL模型）
+- 🖼️ 图生文功能
+- 📱 响应式设计
+- 🌍 多语言支持
+- 📝 历史记录管理
+- ⭐ 收藏功能
+- 🎯 多种艺术风格
+- 🔄 智能重试机制
+
+## 技术栈
+
+- Next.js 15.2.0
+- React 18.3.1
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- Shadcn UI
+- Replicate API
+
+## 部署状态
+
+✅ 环境变量已配置 - 2025年6月6日更新
 
 🎨 **完全免费** | 🚀 **无需注册** | ⚡ **即刻开始**
 
