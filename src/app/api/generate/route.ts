@@ -17,25 +17,26 @@ const BACKUP_MODELS = {
 
 function enhancePromptForStyle(prompt: string, style?: string): string {
   const styleEnhancements = {
-    'digital-art': ', digital art, concept art, trending on artstation',
-    'watercolor': ', watercolor painting, soft brushstrokes, artistic',
-    'oil-painting': ', oil painting, classical art style, rich textures',
-    'sketch': ', pencil sketch, hand drawn, artistic sketch',
-    'anime': ', anime style, manga art, japanese animation',
-    'photorealistic': ', photorealistic, high detail, professional photography',
-    '3d-render': ', 3D render, cinema 4d, octane render, high quality',
-    'cyberpunk': ', cyberpunk style, neon lights, futuristic, sci-fi',
-    'fantasy': ', fantasy art, magical, ethereal, mystical atmosphere',
+    'digital-art': ', digital art style',
+    'watercolor': ', watercolor painting style',
+    'oil-painting': ', oil painting style',
+    'sketch': ', pencil sketch style',
+    'anime': ', anime style',
+    'photorealistic': ', photorealistic style',
+    '3d-render': ', 3D render style',
+    'cyberpunk': ', cyberpunk style',
+    'fantasy': ', fantasy art style',
   };
 
   let enhancedPrompt = prompt;
   
+  // 只在有明确风格选择时才添加风格词
   if (style && style !== 'none' && styleEnhancements[style as keyof typeof styleEnhancements]) {
     enhancedPrompt += styleEnhancements[style as keyof typeof styleEnhancements];
   }
   
-  // 添加质量提升词
-  enhancedPrompt += ', high quality, detailed, masterpiece';
+  // 只添加基本的质量词，避免过度影响内容
+  enhancedPrompt += ', high quality';
   
   return enhancedPrompt;
 }
@@ -72,11 +73,11 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('🎨 Starting image generation with FLUX SCHNELL:', { prompt, style, quality, aspectRatio });
-
-    console.log('Generating image with FLUX SCHNELL:', { prompt, style, quality, aspectRatio });
+    console.log('📥 Original prompt received:', prompt);
 
     // 增强提示词
     const enhancedPrompt = enhancePromptForStyle(prompt, style);
+    console.log('📝 Enhanced prompt to be sent:', enhancedPrompt);
 
     // 映射前端的 aspectRatio 到 FLUX SCHNELL 支持的格式
     const aspectRatioMap: Record<string, string> = {
