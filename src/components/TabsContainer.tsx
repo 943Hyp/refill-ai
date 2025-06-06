@@ -6,6 +6,7 @@ import ImageGenerator from '@/components/ImageGenerator';
 import ImageToPrompt from '@/components/ImageToPrompt';
 import HistoryView from '@/components/HistoryView';
 import PromptTemplates from '@/components/PromptTemplates';
+import UsageLimitsInfo from '@/components/UsageLimitsInfo';
 import { Locale, getTranslation } from '@/lib/i18n';
 
 interface TabsContainerProps {
@@ -89,6 +90,8 @@ const TabsContainer = forwardRef<TabsContainerRef, TabsContainerProps>(
               </TabsTrigger>
             ))}
           </TabsList>
+
+          {/* Usage Limits Info - Hidden from users */}
 
           {/* Tab Content */}
           <div className="min-h-[600px]">

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { generateImage, saveToHistory } from "@/lib/api";
 import { toast } from "sonner";
 import { Locale, getTranslation } from '@/lib/i18n';
+import { rateLimiter } from '@/lib/rateLimiter';
 
 interface ImageGeneratorProps {
   locale: Locale;
@@ -28,9 +29,47 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
     const [selectedAspect, setSelectedAspect] = useState("square");
     const [retryCount, setRetryCount] = useState(0);
     const [estimatedTime, setEstimatedTime] = useState(0);
+    const [usageInfo, setUsageInfo] = useState<{ count: number; nextCooldown?: string }>({ count: 0 });
+    const [rateLimitInfo, setRateLimitInfo] = useState<{ waitTime?: number; message?: string } | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const t = (key: keyof typeof import('@/lib/i18n').translations.zh) => getTranslation(locale, key);
+
+    // Update usage info on component mount and after each generation
+    useEffect(() => {
+      updateUsageInfo();
+    }, []);
+
+    // Countdown timer for rate limit
+    useEffect(() => {
+      let interval: NodeJS.Timeout;
+      
+      if (rateLimitInfo?.waitTime && rateLimitInfo.waitTime > 0) {
+        interval = setInterval(() => {
+          setRateLimitInfo(prev => {
+            if (!prev || !prev.waitTime || prev.waitTime <= 1) {
+              // Time's up, clear the rate limit
+              return null;
+            }
+            return {
+              ...prev,
+              waitTime: prev.waitTime - 1
+            };
+          });
+        }, 1000);
+      }
+
+      return () => {
+        if (interval) {
+          clearInterval(interval);
+        }
+      };
+    }, [rateLimitInfo?.waitTime]);
+
+    const updateUsageInfo = () => {
+      const info = rateLimiter.getUsageInfo();
+      setUsageInfo(info);
+    };
 
     // Expose methods via ref
     useImperativeHandle(ref, () => ({
@@ -112,6 +151,21 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
         return;
       }
 
+      // Check rate limit before generating - Silent limiting
+      const limitCheck = rateLimiter.checkLimit();
+      if (!limitCheck.allowed) {
+        setRateLimitInfo({
+          waitTime: limitCheck.waitTime,
+          // 简化消息，不暴露具体限制规则
+          message: locale === 'zh' ? '请求过于频繁，请稍后再试' : 'Too many requests, please try again later'
+        });
+        toast.error(locale === 'zh' ? '请求过于频繁，请稍后再试' : 'Too many requests, please try again later');
+        return;
+      }
+
+      // Clear any previous rate limit info
+      setRateLimitInfo(null);
+
       if (!isRetry) {
         setRetryCount(0);
       }
@@ -158,6 +212,9 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
 
         toast.success(locale === 'zh' ? '图像生成成功！' : 'Image generated successfully!');
         setRetryCount(0);
+        
+        // Update usage info after successful generation
+        updateUsageInfo();
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         toast.error(`${t('generateFailed')}: ${errorMessage}`);
@@ -355,11 +412,28 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
             </div>
           </div>
 
+          {/* No usage info shown to users - silent rate limiting */}
+
+          {/* Rate Limit Warning */}
+          {rateLimitInfo && (
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+              <div className="flex items-center gap-2 text-destructive text-sm">
+                <span>⏰</span>
+                <span>{rateLimitInfo.message}</span>
+              </div>
+              {rateLimitInfo.waitTime && (
+                <div className="mt-2 text-xs text-muted-foreground">
+                  {locale === 'zh' ? '剩余等待时间: ' : 'Remaining wait time: '}{rateLimitInfo.waitTime}{locale === 'zh' ? '秒' : 's'}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Generate Button */}
           <div className="space-y-3">
             <Button
               onClick={() => handleGenerateImage(false)}
-              disabled={isGenerating || !prompt.trim()}
+              disabled={isGenerating || !prompt.trim() || Boolean(rateLimitInfo?.waitTime && rateLimitInfo.waitTime > 0)}
               className="w-full py-4 text-base font-medium relative overflow-hidden"
               size="lg"
             >
@@ -367,6 +441,11 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                 <>
                   <span className="animate-spin mr-2">🎨</span>
                   {t('generating')}
+                </>
+              ) : rateLimitInfo?.waitTime && rateLimitInfo.waitTime > 0 ? (
+                <>
+                  <span className="mr-2">⏰</span>
+                  {locale === 'zh' ? '请等待' : 'Please wait'}
                 </>
               ) : (
                 <>
