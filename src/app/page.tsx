@@ -10,6 +10,7 @@ import FAQSection from '@/components/sections/FAQSection';
 import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import TabsContainer from '@/components/TabsContainer';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
+import MouseFollower from '@/components/MouseFollower';
 import { Locale } from '@/lib/i18n';
 
 export default function Home() {
@@ -168,6 +169,9 @@ export default function Home() {
           },
         }}
       />
+
+      {/* Mouse Follower Effect */}
+      <MouseFollower />
       </div>
   );
 }
