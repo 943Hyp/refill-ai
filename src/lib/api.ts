@@ -77,18 +77,18 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-// Enhanced mock images with better variety
+// Enhanced mock images with better variety - using more reliable sources
 const mockImages = [
-  "https://images.unsplash.com/photo-1682687220063-4742bd7fd538",
-  "https://images.unsplash.com/photo-1682687982183-c2937a37a21a", 
-  "https://images.unsplash.com/photo-1682695796497-31a44224d6d6",
-  "https://images.unsplash.com/photo-1688891584219-6e753d5acef8",
-  "https://images.unsplash.com/photo-1688891584184-6ab9738bd13d",
-  "https://images.unsplash.com/photo-1707343843437-caacff5cfa74",
-  "https://images.unsplash.com/photo-1707343843982-f8275f3994c5",
-  "https://images.unsplash.com/photo-1707344088547-3cf7cea5ca49",
-  "https://images.unsplash.com/photo-1707344213306-1b3971e2b9a5",
-  "https://images.unsplash.com/photo-1707344088992-4b78e3b8f5e5"
+  "https://picsum.photos/1024/1024?random=1",
+  "https://picsum.photos/1024/1024?random=2",
+  "https://picsum.photos/1024/1024?random=3",
+  "https://picsum.photos/1024/1024?random=4",
+  "https://picsum.photos/1024/1024?random=5",
+  "https://picsum.photos/1024/1024?random=6",
+  "https://picsum.photos/1024/1024?random=7",
+  "https://picsum.photos/1024/1024?random=8",
+  "https://picsum.photos/1024/1024?random=9",
+  "https://picsum.photos/1024/1024?random=10"
 ];
 
 // Storage keys
