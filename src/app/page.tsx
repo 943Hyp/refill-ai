@@ -56,12 +56,12 @@ export default function Home() {
           <section id="app-section" className="min-h-screen py-8">
             <div className="container mx-auto px-4">
               {/* Back to Home Button */}
-              <div className="mb-6">
+              <div className="mb-8">
                 <button
                   onClick={() => setShowApp(false)}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center gap-2 text-base md:text-lg font-medium px-4 py-2.5 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105"
                 >
-                  <span>←</span>
+                  <span className="text-xl">←</span>
                   <span>{locale === 'zh' ? '返回首页' : 'Back to Home'}</span>
                 </button>
               </div>

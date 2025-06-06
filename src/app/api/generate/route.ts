@@ -19,16 +19,21 @@ const BACKUP_MODELS = {
 const animalKeywords: Record<string, string> = {
   '猫': 'cat',
   '小猫': 'kitten',
+  '猫咪': 'kitty',
   '狗': 'dog',
   '小狗': 'puppy',
   '鱼': 'fish',
+  '金鱼': 'goldfish',
   '鸟': 'bird',
+  '小鸟': 'small bird',
   '熊': 'bear',
+  '小熊': 'bear cub',
   '老虎': 'tiger',
   '狮子': 'lion',
   '大象': 'elephant',
   '长颈鹿': 'giraffe',
   '兔子': 'rabbit',
+  '小兔子': 'bunny',
   '松鼠': 'squirrel',
   '猴子': 'monkey',
   '熊猫': 'panda',
@@ -39,12 +44,38 @@ const animalKeywords: Record<string, string> = {
   '鲨鱼': 'shark',
   '青蛙': 'frog',
   '蛇': 'snake',
-  '龙': 'dragon'
+  '龙': 'dragon',
+  '恐龙': 'dinosaur',
+  '狐狸': 'fox',
+  '浣熊': 'raccoon',
+  '考拉': 'koala',
+  '羊': 'sheep',
+  '山羊': 'goat',
+  '猫头鹰': 'owl',
+  '企鹅': 'penguin',
+  '老鼠': 'mouse',
+  '仓鼠': 'hamster',
+  '鸭子': 'duck',
+  '鹅': 'goose',
+  '鹦鹉': 'parrot',
+  '蜘蛛': 'spider',
+  '蚂蚁': 'ant',
+  '蜜蜂': 'bee',
+  '蝎子': 'scorpion',
+  '蟹': 'crab',
+  '虾': 'shrimp',
+  '乌龟': 'turtle',
+  '蜗牛': 'snail',
+  '牛': 'cow',
+  '马': 'horse',
+  '驴': 'donkey',
+  '河马': 'hippo'
 };
 
 // 翻译常见的中文描述词
 const attributeKeywords: Record<string, string> = {
   '可爱': 'cute',
+  '萌': 'adorable',
   '美丽': 'beautiful',
   '漂亮': 'pretty',
   '帅气': 'handsome',
@@ -52,6 +83,8 @@ const attributeKeywords: Record<string, string> = {
   '恐怖': 'terrifying',
   '大': 'big',
   '小': 'small',
+  '巨大': 'huge',
+  '微小': 'tiny',
   '高': 'tall',
   '矮': 'short',
   '胖': 'fat',
@@ -76,26 +109,139 @@ const attributeKeywords: Record<string, string> = {
   '粉色': 'pink',
   '黑色': 'black',
   '白色': 'white',
-  '吃': 'eating',
-  '喝': 'drinking',
-  '睡觉': 'sleeping',
-  '跑': 'running',
-  '跳': 'jumping',
-  '玩': 'playing',
-  '游泳': 'swimming',
-  '飞': 'flying'
+  '灰色': 'gray',
+  '橙色': 'orange',
+  '棕色': 'brown',
+  '金色': 'golden',
+  '银色': 'silver',
+  '毛茸茸': 'fluffy',
+  '光滑': 'smooth',
+  '圆': 'round',
+  '方': 'square',
+  '长': 'long',
+  '短': 'short',
+  '明亮': 'bright',
+  '黑暗': 'dark',
+  '透明': 'transparent',
+  '模糊': 'blurry',
+  '清晰': 'clear',
+  '湿': 'wet',
+  '干': 'dry',
+  '热': 'hot',
+  '冷': 'cold',
+  '新': 'new',
+  '旧': 'old',
+  '干净': 'clean',
+  '脏': 'dirty',
+  '甜': 'sweet',
+  '苦': 'bitter',
+  '咸': 'salty',
+  '酸': 'sour',
+  '辣': 'spicy',
+  '硬': 'hard',
+  '软': 'soft'
 };
 
 // 动作描述词典
 const actionKeywords: Record<string, string> = {
   '在吃': 'eating',
+  '吃': 'eating',
+  '进食': 'eating',
   '在喝': 'drinking',
+  '喝': 'drinking',
   '在睡': 'sleeping',
+  '睡觉': 'sleeping',
+  '休息': 'resting',
   '在跑': 'running',
+  '跑': 'running',
   '在跳': 'jumping',
+  '跳': 'jumping',
   '在玩': 'playing',
+  '玩': 'playing',
   '在游泳': 'swimming',
-  '在飞': 'flying'
+  '游泳': 'swimming',
+  '在飞': 'flying',
+  '飞': 'flying',
+  '站': 'standing',
+  '站立': 'standing',
+  '躺': 'lying',
+  '躺着': 'lying down',
+  '坐': 'sitting',
+  '坐着': 'sitting down',
+  '走': 'walking',
+  '走路': 'walking',
+  '看': 'looking',
+  '看着': 'looking at',
+  '聆听': 'listening',
+  '听': 'listening',
+  '舔': 'licking',
+  '微笑': 'smiling',
+  '大笑': 'laughing',
+  '哭': 'crying',
+  '跳舞': 'dancing',
+  '唱歌': 'singing',
+  '叫': 'calling',
+  '冲': 'rushing',
+  '打': 'hitting',
+  '爬': 'climbing',
+  '潜水': 'diving',
+  '拥抱': 'hugging',
+  '亲吻': 'kissing',
+  '握手': 'shaking hands',
+  '挥手': 'waving',
+  '抓': 'grabbing',
+  '推': 'pushing',
+  '拉': 'pulling'
+};
+
+// 场景关键词
+const sceneKeywords: Record<string, string> = {
+  '森林': 'forest',
+  '山': 'mountain',
+  '海': 'sea',
+  '海洋': 'ocean',
+  '沙滩': 'beach',
+  '草地': 'grassland',
+  '草原': 'prairie',
+  '沙漠': 'desert',
+  '湖': 'lake',
+  '河': 'river',
+  '瀑布': 'waterfall',
+  '城市': 'city',
+  '街道': 'street',
+  '乡村': 'countryside',
+  '公园': 'park',
+  '花园': 'garden',
+  '天空': 'sky',
+  '云': 'cloud',
+  '雨': 'rain',
+  '雪': 'snow',
+  '星空': 'starry sky',
+  '日出': 'sunrise',
+  '日落': 'sunset',
+  '家': 'home',
+  '房子': 'house',
+  '学校': 'school',
+  '办公室': 'office',
+  '商店': 'store',
+  '餐厅': 'restaurant',
+  '医院': 'hospital',
+  '机场': 'airport',
+  '车站': 'station',
+  '火车': 'train',
+  '汽车': 'car',
+  '船': 'boat',
+  '飞机': 'plane',
+  '桥': 'bridge',
+  '窗户': 'window',
+  '门': 'door',
+  '树': 'tree',
+  '花': 'flower',
+  '草': 'grass',
+  '果实': 'fruit',
+  '阳光': 'sunshine',
+  '月亮': 'moon',
+  '星星': 'star'
 };
 
 function enhancePromptForStyle(prompt: string, style?: string): string {
@@ -121,36 +267,56 @@ function enhancePromptForStyle(prompt: string, style?: string): string {
   if (hasChinese) {
     console.log('🇨🇳 检测到中文提示词，进行关键词强化...');
     
-    // 应用中文关键词翻译
-    let enhancedChinese = prompt;
-    
     // 添加英文前缀以确保模型理解
     let englishPrompt = "";
+    let foundKeywords = false;
     
-    // 检查是否包含动物关键词
-    Object.entries(animalKeywords).forEach(([chinese, english]) => {
+    // 1. 先尝试识别场景词
+    Object.entries(sceneKeywords).forEach(([chinese, english]) => {
       if (prompt.includes(chinese)) {
         englishPrompt += english + " ";
+        foundKeywords = true;
       }
     });
     
-    // 检查是否包含描述词
+    // 2. 识别动物关键词 - 优先匹配较长的短语
+    const sortedAnimalKeys = Object.keys(animalKeywords).sort((a, b) => b.length - a.length);
+    for (const chinese of sortedAnimalKeys) {
+      if (prompt.includes(chinese)) {
+        englishPrompt += animalKeywords[chinese] + " ";
+        foundKeywords = true;
+        break; // 通常一个提示词只包含一个主要动物
+      }
+    }
+    
+    // 3. 识别所有描述词
     Object.entries(attributeKeywords).forEach(([chinese, english]) => {
       if (prompt.includes(chinese)) {
         englishPrompt += english + " ";
+        foundKeywords = true;
       }
     });
     
-    // 检查是否包含动作词
-    Object.entries(actionKeywords).forEach(([chinese, english]) => {
+    // 4. 识别动作词 - 优先匹配较长的短语
+    const sortedActionKeys = Object.keys(actionKeywords).sort((a, b) => b.length - a.length);
+    for (const chinese of sortedActionKeys) {
       if (prompt.includes(chinese)) {
-        englishPrompt += english + " ";
+        englishPrompt += actionKeywords[chinese] + " ";
+        foundKeywords = true;
+        break; // 通常一个提示词只包含一个主要动作
       }
-    });
+    }
     
-    // 如果发现了关键词，添加到原始提示词
-    if (englishPrompt.length > 0) {
-      translatedPrompt = `${prompt} (${englishPrompt.trim()})`;
+    // 如果发现了关键词，构建更自然的英语描述
+    if (foundKeywords) {
+      const trimmedEnglish = englishPrompt.trim();
+      
+      // 如果是动物类图片，添加冠词
+      const hasAnimal = sortedAnimalKeys.some(key => prompt.includes(key));
+      const articlePrefix = hasAnimal ? "a " : "";
+      
+      // 添加到原始提示词，但更突出英文部分
+      translatedPrompt = `${prompt} (${articlePrefix}${trimmedEnglish})`;
       console.log('🔄 增强后的提示词:', translatedPrompt);
     }
   }
