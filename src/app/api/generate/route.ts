@@ -69,7 +69,26 @@ const animalKeywords: Record<string, string> = {
   '牛': 'cow',
   '马': 'horse',
   '驴': 'donkey',
-  '河马': 'hippo'
+  '河马': 'hippo',
+  '大熊猫': 'giant panda',
+  '孔雀': 'peacock',
+  '斑马': 'zebra',
+  '骆驼': 'camel',
+  '袋鼠': 'kangaroo',
+  '豹子': 'leopard',
+  '猎豹': 'cheetah',
+  '北极熊': 'polar bear',
+  '犀牛': 'rhino',
+  '海狮': 'sea lion',
+  '水獭': 'otter',
+  '海星': 'starfish',
+  '章鱼': 'octopus',
+  '鳄鱼': 'crocodile',
+  '变色龙': 'chameleon',
+  '壁虎': 'gecko',
+  '蝙蝠': 'bat',
+  '刺猬': 'hedgehog',
+  '无尾熊': 'koala'
 };
 
 // 翻译常见的中文描述词
@@ -139,7 +158,27 @@ const attributeKeywords: Record<string, string> = {
   '酸': 'sour',
   '辣': 'spicy',
   '硬': 'hard',
-  '软': 'soft'
+  '软': 'soft',
+  '华丽': 'gorgeous',
+  '优雅': 'elegant',
+  '神秘': 'mysterious',
+  '奇幻': 'fantastic',
+  '幻想': 'fantasy',
+  '卡通': 'cartoon',
+  '写实': 'realistic',
+  '超现实': 'surreal',
+  '梦幻': 'dreamy',
+  '古典': 'classical',
+  '现代': 'modern',
+  '未来': 'futuristic',
+  '科幻': 'sci-fi',
+  '霓虹': 'neon',
+  '复古': 'retro',
+  '精致': 'delicate',
+  '粗糙': 'rough',
+  '闪亮': 'shiny',
+  '模糊': 'fuzzy',
+  '锋利': 'sharp'
 };
 
 // 动作描述词典
@@ -191,7 +230,26 @@ const actionKeywords: Record<string, string> = {
   '挥手': 'waving',
   '抓': 'grabbing',
   '推': 'pushing',
-  '拉': 'pulling'
+  '拉': 'pulling',
+  '奔跑': 'running fast',
+  '漂浮': 'floating',
+  '滑行': 'gliding',
+  '蹦跳': 'bouncing',
+  '潜伏': 'lurking',
+  '狩猎': 'hunting',
+  '捕食': 'preying',
+  '觅食': 'foraging',
+  '嬉戏': 'frolicking',
+  '战斗': 'fighting',
+  '演奏': 'playing music',
+  '绘画': 'painting',
+  '阅读': 'reading',
+  '写作': 'writing',
+  '思考': 'thinking',
+  '沉思': 'meditating',
+  '祈祷': 'praying',
+  '漫步': 'strolling',
+  '奔驰': 'galloping'
 };
 
 // 场景关键词
@@ -241,7 +299,87 @@ const sceneKeywords: Record<string, string> = {
   '果实': 'fruit',
   '阳光': 'sunshine',
   '月亮': 'moon',
-  '星星': 'star'
+  '星星': 'star',
+  '峡谷': 'canyon',
+  '悬崖': 'cliff',
+  '洞穴': 'cave',
+  '岛屿': 'island',
+  '火山': 'volcano',
+  '极光': 'aurora',
+  '冰川': 'glacier',
+  '雪山': 'snowy mountain',
+  '热带雨林': 'tropical rainforest',
+  '珊瑚礁': 'coral reef',
+  '深海': 'deep sea',
+  '太空': 'space',
+  '银河': 'galaxy',
+  '宇宙': 'universe',
+  '古堡': 'ancient castle',
+  '神殿': 'temple',
+  '城堡': 'castle',
+  '宫殿': 'palace',
+  '庭院': 'courtyard',
+  '温室': 'greenhouse',
+  '市场': 'market',
+  '广场': 'square',
+  '码头': 'dock',
+  '港口': 'harbor',
+  '灯塔': 'lighthouse'
+};
+
+// 物体关键词
+const objectKeywords: Record<string, string> = {
+  '书': 'book',
+  '桌子': 'table',
+  '椅子': 'chair',
+  '沙发': 'sofa',
+  '电视': 'TV',
+  '电脑': 'computer',
+  '手机': 'phone',
+  '相机': 'camera',
+  '钟表': 'clock',
+  '杯子': 'cup',
+  '盘子': 'plate',
+  '刀': 'knife',
+  '叉子': 'fork',
+  '勺子': 'spoon',
+  '碗': 'bowl',
+  '瓶子': 'bottle',
+  '罐子': 'jar',
+  '玩具': 'toy',
+  '气球': 'balloon',
+  '礼物': 'gift',
+  '纸': 'paper',
+  '笔': 'pen',
+  '铅笔': 'pencil',
+  '钥匙': 'key',
+  '钱包': 'wallet',
+  '包': 'bag',
+  '箱子': 'box',
+  '帽子': 'hat',
+  '眼镜': 'glasses',
+  '雨伞': 'umbrella',
+  '手表': 'watch',
+  '戒指': 'ring',
+  '项链': 'necklace',
+  '耳环': 'earrings',
+  '衣服': 'clothes',
+  '裙子': 'dress',
+  '裤子': 'pants',
+  '鞋子': 'shoes',
+  '靴子': 'boots',
+  '窗帘': 'curtain',
+  '地毯': 'carpet',
+  '床': 'bed',
+  '枕头': 'pillow',
+  '被子': 'blanket',
+  '镜子': 'mirror',
+  '灯': 'lamp',
+  '画': 'painting',
+  '雕塑': 'sculpture',
+  '花瓶': 'vase',
+  '门': 'door',
+  '窗': 'window'
 };
 
 function enhancePromptForStyle(prompt: string, style?: string): string {
@@ -268,14 +406,12 @@ function enhancePromptForStyle(prompt: string, style?: string): string {
     console.log('🇨🇳 检测到中文提示词，进行关键词强化...');
     
     // 添加英文前缀以确保模型理解
-    let englishPrompt = "";
-    let foundKeywords = false;
+    const keywords: {[key: string]: string} = {};
     
     // 1. 先尝试识别场景词
     Object.entries(sceneKeywords).forEach(([chinese, english]) => {
       if (prompt.includes(chinese)) {
-        englishPrompt += english + " ";
-        foundKeywords = true;
+        keywords[chinese] = english;
       }
     });
     
@@ -283,41 +419,91 @@ function enhancePromptForStyle(prompt: string, style?: string): string {
     const sortedAnimalKeys = Object.keys(animalKeywords).sort((a, b) => b.length - a.length);
     for (const chinese of sortedAnimalKeys) {
       if (prompt.includes(chinese)) {
-        englishPrompt += animalKeywords[chinese] + " ";
-        foundKeywords = true;
+        keywords[chinese] = animalKeywords[chinese];
         break; // 通常一个提示词只包含一个主要动物
       }
     }
     
-    // 3. 识别所有描述词
-    Object.entries(attributeKeywords).forEach(([chinese, english]) => {
+    // 3. 识别物体关键词
+    Object.entries(objectKeywords).forEach(([chinese, english]) => {
       if (prompt.includes(chinese)) {
-        englishPrompt += english + " ";
-        foundKeywords = true;
+        keywords[chinese] = english;
       }
     });
     
-    // 4. 识别动作词 - 优先匹配较长的短语
+    // 4. 识别所有描述词
+    Object.entries(attributeKeywords).forEach(([chinese, english]) => {
+      if (prompt.includes(chinese)) {
+        keywords[chinese] = english;
+      }
+    });
+    
+    // 5. 识别动作词 - 优先匹配较长的短语
     const sortedActionKeys = Object.keys(actionKeywords).sort((a, b) => b.length - a.length);
     for (const chinese of sortedActionKeys) {
       if (prompt.includes(chinese)) {
-        englishPrompt += actionKeywords[chinese] + " ";
-        foundKeywords = true;
+        keywords[chinese] = actionKeywords[chinese];
         break; // 通常一个提示词只包含一个主要动作
       }
     }
     
-    // 如果发现了关键词，构建更自然的英语描述
-    if (foundKeywords) {
+    // 构建更自然的英语描述
+    if (Object.keys(keywords).length > 0) {
+      // 确定是否包含主体(动物/人物/物体)
+      const hasSubject = sortedAnimalKeys.some(key => prompt.includes(key)) || 
+                        Object.keys(objectKeywords).some(key => prompt.includes(key));
+      
+      // 收集形容词、动作和场景
+      const attributes: string[] = [];
+      const actions: string[] = [];
+      const scenes: string[] = [];
+      const subjects: string[] = [];
+      
+      Object.entries(keywords).forEach(([chinese, english]) => {
+        if (animalKeywords[chinese] || objectKeywords[chinese]) {
+          subjects.push(english);
+        } else if (attributeKeywords[chinese]) {
+          attributes.push(english);
+        } else if (actionKeywords[chinese]) {
+          actions.push(english);
+        } else if (sceneKeywords[chinese]) {
+          scenes.push(english);
+        }
+      });
+      
+      // 构建更自然的英语句子
+      let englishPrompt = "";
+      
+      // 添加冠词
+      const articlePrefix = hasSubject ? "a " : "";
+      
+      // 形容词
+      if (attributes.length > 0) {
+        englishPrompt += attributes.join(" ") + " ";
+      }
+      
+      // 主体
+      if (subjects.length > 0) {
+        englishPrompt += subjects[0] + " ";
+      }
+      
+      // 动作
+      if (actions.length > 0) {
+        englishPrompt += actions[0] + " ";
+      }
+      
+      // 场景
+      if (scenes.length > 0) {
+        englishPrompt += "in " + scenes.join(" ") + " ";
+      }
+      
       const trimmedEnglish = englishPrompt.trim();
       
-      // 如果是动物类图片，添加冠词
-      const hasAnimal = sortedAnimalKeys.some(key => prompt.includes(key));
-      const articlePrefix = hasAnimal ? "a " : "";
-      
       // 添加到原始提示词，但更突出英文部分
-      translatedPrompt = `${prompt} (${articlePrefix}${trimmedEnglish})`;
-      console.log('🔄 增强后的提示词:', translatedPrompt);
+      if (trimmedEnglish) {
+        translatedPrompt = `${prompt} (${articlePrefix}${trimmedEnglish})`;
+        console.log('🔄 增强后的提示词:', translatedPrompt);
+      }
     }
   }
   
