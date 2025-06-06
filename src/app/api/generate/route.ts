@@ -44,17 +44,22 @@ function enhancePromptForStyle(prompt: string, style?: string): string {
 export async function POST(request: NextRequest) {
   try {
     console.log('🔍 API Route called - checking environment...');
+    console.log('🌍 Environment:', process.env.NODE_ENV);
+    console.log('🔑 All env keys:', Object.keys(process.env).filter(key => key.includes('REPLICATE')));
     
     // 检查API密钥
     const apiToken = process.env.REPLICATE_API_TOKEN;
     console.log('API Token check:', {
       hasEnvToken: !!process.env.REPLICATE_API_TOKEN,
       tokenLength: apiToken?.length,
-      tokenPrefix: apiToken?.substring(0, 8)
+      tokenPrefix: apiToken?.substring(0, 8),
+      nodeEnv: process.env.NODE_ENV,
+      vercelEnv: process.env.VERCEL_ENV
     });
 
     if (!apiToken) {
       console.log('❌ Replicate API token not configured');
+      console.log('Available env vars:', Object.keys(process.env).slice(0, 10));
       return NextResponse.json(
         { error: 'Replicate API token not configured: Token missing' },
         { status: 503 }
