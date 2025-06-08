@@ -5,9 +5,9 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Refill AI - 免费AI图像生成平台 v2.0",
-  description: "免费的AI图像生成平台，无需注册，即刻开始创作。支持文生图、图生文等功能。支持4张图片生成和完整历史记录。",
-  keywords: "AI图像生成,免费AI,文生图,图生文,提示词,AI绘画,人工智能,图像创作",
+  title: "Refill AI - Free AI Image Generation Platform v2.0",
+  description: "Free AI image generation platform. No registration required, start creating instantly. Supports text-to-image, image analysis, and more. Generate 4 images with complete history.",
+  keywords: "AI image generation,free AI,text to image,image analysis,prompts,AI art,artificial intelligence,image creation",
   authors: [{ name: "Refill AI Team" }],
   creator: "Refill AI",
   publisher: "Refill AI",
@@ -16,34 +16,34 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://refill-ai.com'),
+  metadataBase: new URL('https://refillai.online'),
   alternates: {
     canonical: '/',
     languages: {
+      'en-US': '/',
       'zh-CN': '/zh',
-      'en-US': '/en',
     },
   },
   openGraph: {
-    title: "Refill AI - 免费AI图像生成平台",
-    description: "免费的AI图像生成平台，无需注册，即刻开始创作",
-    url: 'https://refill-ai.com',
+    title: "Refill AI - Free AI Image Generation Platform",
+    description: "Free AI image generation platform. No registration required, start creating instantly",
+    url: 'https://refillai.online',
     siteName: 'Refill AI',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Refill AI - 免费AI图像生成平台',
+        alt: 'Refill AI - Free AI Image Generation Platform',
       },
     ],
-    locale: 'zh_CN',
+    locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Refill AI - 免费AI图像生成平台",
-    description: "免费的AI图像生成平台，无需注册，即刻开始创作",
+    title: "Refill AI - Free AI Image Generation Platform",
+    description: "Free AI image generation platform. No registration required, start creating instantly",
     images: ['/og-image.png'],
     creator: '@refill_ai',
   },
@@ -99,7 +99,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* PWA Meta Tags */}
         <meta name="application-name" content="Refill AI" />
@@ -140,8 +140,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebApplication",
               "name": "Refill AI",
-              "description": "免费的AI图像生成平台，无需注册，即刻开始创作",
-              "url": "https://refill-ai.com",
+              "description": "Free AI image generation platform. No registration required, start creating instantly",
+              "url": "https://refillai.online",
               "applicationCategory": "GraphicsApplication",
               "operatingSystem": "Any",
               "offers": {
@@ -150,10 +150,9 @@ export default function RootLayout({
                 "priceCurrency": "USD"
               },
               "featureList": [
-                "AI图像生成",
-                "图像分析", 
-        
-                "历史记录"
+                "AI Image Generation",
+                "Image Analysis",
+                "History Records"
               ]
             })
           }}

@@ -14,7 +14,7 @@ import MouseFollower from '@/components/MouseFollower';
 import { Locale } from '@/lib/i18n';
 
 export default function Home() {
-  const [locale, setLocale] = useState<Locale>('zh');
+  const [locale, setLocale] = useState<Locale>('en');
   const [showApp, setShowApp] = useState(false);
   const tabsRef = useRef<{ 
     handleGenerate: () => void;
