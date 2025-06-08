@@ -128,6 +128,25 @@ export default function RootLayout({
         {/* Analytics */}
         <script defer data-domain="refillai.online" src="https://plausible.io/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js"></script>
         
+        {/* Manual Plausible verification trigger */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            window.addEventListener('load', function() {
+              setTimeout(function() {
+                if (window.plausible) {
+                  window.plausible('Verification Test', {
+                    props: { 
+                      test: 'manual_verification',
+                      timestamp: new Date().toISOString()
+                    }
+                  });
+                  console.log('Plausible verification event sent');
+                }
+              }, 2000);
+            });
+          `
+        }} />
+        
         {/* Structured Data */}
         <script
           type="application/ld+json"
