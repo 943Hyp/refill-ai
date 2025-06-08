@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Toaster } from 'sonner';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -12,6 +12,7 @@ import TabsContainer from '@/components/TabsContainer';
 import KeyboardShortcuts from '@/components/ui/KeyboardShortcuts';
 import MouseFollower from '@/components/MouseFollower';
 import { Locale } from '@/lib/i18n';
+import { analytics, initAnalytics } from '@/lib/analytics';
 
 export default function Home() {
   const [locale, setLocale] = useState<Locale>('en');
@@ -22,7 +23,23 @@ export default function Home() {
     handleToggleHistory: () => void;
   }>(null);
 
+  // Initialize analytics on component mount
+  useEffect(() => {
+    initAnalytics();
+  }, []);
+
+  // Track locale changes
+  useEffect(() => {
+    if (locale) {
+      analytics.trackLanguageChange('auto', locale);
+    }
+  }, [locale]);
+
   const handleGetStarted = () => {
+    // Track user engagement
+    analytics.trackEngagement('get_started_clicked');
+    analytics.trackFeatureUsage('navigation', 'enter_app');
+    
     setShowApp(true);
     // 滚动到应用区域
     setTimeout(() => {

@@ -300,3 +300,5 @@ Refill AI 支持 Progressive Web App (PWA) 功能：
     <a href="https://twitter.com/refill_ai">Twitter</a>
   </p>
 </div>
+
+Last updated: 2025-01-14 - Force deployment trigger
