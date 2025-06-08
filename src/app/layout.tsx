@@ -128,22 +128,37 @@ export default function RootLayout({
         {/* Analytics */}
         <script defer data-domain="refillai.online" src="https://plausible.io/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js"></script>
         
-        {/* Manual Plausible verification trigger */}
+        {/* Enhanced Plausible verification */}
         <script dangerouslySetInnerHTML={{
           __html: `
+            // Multiple verification attempts
+            function verifyPlausible() {
+              if (window.plausible) {
+                // Send multiple verification events
+                window.plausible('Site Verification', { props: { domain: 'refillai.online', test: 'verification' } });
+                window.plausible('pageview', { props: { verification: 'true' } });
+                window.plausible('Integration Test', { props: { status: 'active', timestamp: Date.now() } });
+                console.log('✅ Plausible verification events sent');
+                return true;
+              }
+              return false;
+            }
+            
+            // Try verification multiple times
             window.addEventListener('load', function() {
-              setTimeout(function() {
-                if (window.plausible) {
-                  window.plausible('Verification Test', {
-                    props: { 
-                      test: 'manual_verification',
-                      timestamp: new Date().toISOString()
-                    }
-                  });
-                  console.log('Plausible verification event sent');
-                }
-              }, 2000);
+              setTimeout(verifyPlausible, 1000);
+              setTimeout(verifyPlausible, 3000);
+              setTimeout(verifyPlausible, 5000);
             });
+            
+            // Also try on DOM ready
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(verifyPlausible, 1000);
+              });
+            } else {
+              setTimeout(verifyPlausible, 500);
+            }
           `
         }} />
         
