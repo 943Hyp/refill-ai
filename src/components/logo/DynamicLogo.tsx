@@ -21,14 +21,25 @@ const DynamicLogo = () => {
           className="flex items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg w-full h-full z-10 relative"
           style={{ overflow: 'hidden' }}
         >
-          <span 
-            className="text-white font-bold text-xl"
+          <svg 
+            width="16" 
+            height="16" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+            className="text-white"
             style={{
               filter: `drop-shadow(0 0 2px rgba(255,255,255,0.6))`,
             }}
           >
-            R
-          </span>
+            <path 
+              d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            />
+          </svg>
           <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/20 rounded-lg"></div>
         </div>
       </div>
