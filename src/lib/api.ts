@@ -6,7 +6,7 @@ export async function generateImageWithReplicate(params: {
   style?: string;
   quality?: string;
   aspectRatio?: string;
-}): Promise<{ imageUrl: string }> {
+}): Promise<{ imageUrl: string; imageUrls?: string[]; model?: string; enhancedPrompt?: string }> {
   try {
     console.log('Calling Replicate API with params:', params);
     
@@ -28,7 +28,12 @@ export async function generateImageWithReplicate(params: {
 
     const data = await response.json();
     console.log('API success response:', data);
-    return { imageUrl: data.imageUrl };
+    return { 
+      imageUrl: data.imageUrl,
+      imageUrls: data.imageUrls,
+      model: data.model,
+      enhancedPrompt: data.enhancedPrompt
+    };
   } catch (error) {
     console.error('Replicate image generation error:', error);
     throw new Error(`Image generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -201,7 +206,7 @@ class ApiClient {
     style?: string;
     quality?: string;
     aspectRatio?: string;
-  }): Promise<{ imageUrl: string }> {
+  }): Promise<{ imageUrl: string; imageUrls?: string[]; model?: string; enhancedPrompt?: string }> {
     const cacheKey = this.getCacheKey('generateImage', params);
     const cached = this.getFromCache<{ imageUrl: string }>(cacheKey);
     
@@ -310,7 +315,7 @@ export async function generateImage(params: {
   style?: string;
   quality?: string;
   aspectRatio?: string;
-}): Promise<{ imageUrl: string }> {
+}): Promise<{ imageUrl: string; imageUrls?: string[]; model?: string; enhancedPrompt?: string }> {
   // In client-side environment, try Replicate API first
   if (typeof window !== 'undefined') {
     try {

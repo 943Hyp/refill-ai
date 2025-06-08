@@ -34,7 +34,7 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
     const [rateLimitInfo, setRateLimitInfo] = useState<{ waitTime?: number; message?: string } | null>(null);
     const [debugInfo, setDebugInfo] = useState<{
       timestamp: string;
-      result: { imageUrl: string; model?: string; enhancedPrompt?: string };
+      result: { imageUrl: string; imageUrls?: string[]; model?: string; enhancedPrompt?: string };
       prompt: string;
       style: string;
       quality: string;
