@@ -413,8 +413,8 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                     </span>
                   </div>
                   
-                  {/* 显示所有图片 */}
-                  <div className="space-y-2">
+                  {/* 显示所有图片 - 横向排列 */}
+                  <div className="grid grid-cols-4 gap-2">
                     {item.imageUrls && item.imageUrls.length > 0 ? (
                       item.imageUrls.map((imageUrl, index) => (
                         <div key={index} className="relative group/image">
@@ -442,12 +442,12 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                                 }}
                                 size="sm"
                                 variant="secondary"
-                                className="h-7 w-7 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
+                                className="h-6 w-6 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
                                 title={locale === 'zh' ? `下载图片 ${index + 1}` : `Download image ${index + 1}`}
                               >
                                 <svg 
-                                  width="12" 
-                                  height="12" 
+                                  width="10" 
+                                  height="10" 
                                   viewBox="0 0 24 24" 
                                   fill="none" 
                                   xmlns="http://www.w3.org/2000/svg"
@@ -482,7 +482,7 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                                 }}
                                 size="sm"
                                 variant="secondary"
-                                className="h-7 w-7 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
+                                className="h-6 w-6 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
                                 title={locale === 'zh' ? `分享图片 ${index + 1}` : `Share image ${index + 1}`}
                               >
                                 <span className="text-gray-700 text-xs">🔗</span>
