@@ -123,6 +123,11 @@ export default function Home() {
                     icon: "🔒",
                     title: locale === 'zh' ? "隐私保护" : "Privacy Protection",
                     desc: locale === 'zh' ? "所有数据本地存储，关闭页面自动清除" : "All data stored locally, automatically cleared when page is closed"
+                  },
+                  {
+                    icon: "🧠",
+                    title: locale === 'zh' ? "先进AI模型" : "Advanced AI Models",
+                    desc: locale === 'zh' ? "基于最新FLUX模型技术，提供业界领先的图像生成质量" : "Based on the latest FLUX model technology, providing industry-leading image generation quality"
                   }
                 ].map((feature, index) => (
                   <div 
