@@ -126,11 +126,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://plausible.io" />
         
         {/* Analytics */}
-        <script 
-          defer 
-          data-domain="refillai.online" 
-          src="https://plausible.io/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js"
-        />
+        <script defer data-domain="refillai.online" src="https://plausible.io/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js"></script>
         
         {/* Structured Data */}
         <script
