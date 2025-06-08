@@ -513,9 +513,9 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                         {item.quality}
                       </span>
                     )}
-                    {item.aspect && (
+                    {item.aspectRatio && (
                       <span className="text-xs bg-accent/50 text-accent-foreground px-2 py-1 rounded-full">
-                        {item.aspect}
+                        {item.aspectRatio}
                       </span>
                     )}
                   </div>
@@ -589,9 +589,9 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                             {item.quality}
                           </span>
                         )}
-                        {item.aspect && (
+                        {item.aspectRatio && (
                           <span className="text-xs bg-accent/50 text-accent-foreground px-2 py-1 rounded-full">
-                            {item.aspect}
+                            {item.aspectRatio}
                           </span>
                         )}
                       </div>

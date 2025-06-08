@@ -798,7 +798,7 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                   </svg>
                   {locale === 'zh' ? '下载全部' : 'Download All'}
                 </Button>
-                <Button onClick={shareImage} variant="outline" size="sm" className="flex-1 sm:flex-none">
+                <Button onClick={() => shareImage(generatedImages[0])} variant="outline" size="sm" className="flex-1 sm:flex-none">
                   <span className="mr-1">🔗</span>
                   {t('shareImage')}
                 </Button>
