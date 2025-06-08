@@ -177,7 +177,7 @@ const attributeKeywords: Record<string, string> = {
   '精致': 'delicate',
   '粗糙': 'rough',
   '闪亮': 'shiny',
-  '模糊': 'fuzzy',
+  '朦胧': 'fuzzy',
   '锋利': 'sharp'
 };
 
