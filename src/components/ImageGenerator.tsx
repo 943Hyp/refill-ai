@@ -323,42 +323,119 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
       setPrompt(randomPrompt);
     };
 
-    const downloadImage = (imageUrl?: string, index?: number) => {
+    const downloadImage = async (imageUrl?: string, index?: number) => {
       const urlToDownload = imageUrl || generatedImage;
-      if (urlToDownload) {
+      console.log('downloadImage called with:', { imageUrl, index, urlToDownload });
+      
+      if (!urlToDownload) {
+        console.error('No URL to download');
+        toast.error(locale === 'zh' ? '没有可下载的图片' : 'No image to download');
+        return;
+      }
+
+      try {
+        console.log('Attempting direct download...');
+        // 尝试直接下载
         const link = document.createElement('a');
         link.href = urlToDownload;
         link.download = `refill-ai-${Date.now()}${index !== undefined ? `-${index + 1}` : ''}.png`;
+        link.target = '_blank';
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
+        console.log('Direct download initiated successfully');
         toast.success(t('imageDownloaded'));
-      }
-    };
-
-    const downloadAllImages = () => {
-      if (generatedImages.length > 0) {
-        generatedImages.forEach((imageUrl, index) => {
-          setTimeout(() => {
-            downloadImage(imageUrl, index);
-          }, index * 500); // 延迟下载避免浏览器阻止
-        });
-        toast.success(locale === 'zh' ? `开始下载 ${generatedImages.length} 张图片` : `Starting download of ${generatedImages.length} images`);
-      }
-    };
-
-    const shareImage = async () => {
-      if (generatedImage) {
+      } catch (error) {
+        console.error('Direct download error:', error);
+        // 如果直接下载失败，尝试通过fetch下载
         try {
-          await navigator.clipboard.writeText(generatedImage);
-          toast.success(locale === 'zh' ? '图像链接已复制到剪贴板' : 'Image link copied to clipboard');
-        } catch (error) {
-          // Fallback for browsers that don't support clipboard API
+          console.log('Attempting fetch download...');
+          const response = await fetch(urlToDownload);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `refill-ai-${Date.now()}${index !== undefined ? `-${index + 1}` : ''}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          console.log('Fetch download completed successfully');
+          toast.success(t('imageDownloaded'));
+        } catch (fetchError) {
+          console.error('Fetch download error:', fetchError);
+          // 最后的备选方案：在新窗口打开图片
+          console.log('Opening image in new window as fallback...');
+          window.open(urlToDownload, '_blank');
+          toast.info(locale === 'zh' ? '图片已在新窗口打开，请右键保存' : 'Image opened in new window, right-click to save');
+        }
+      }
+    };
+
+    const downloadAllImages = async () => {
+      if (generatedImages.length > 0) {
+        toast.success(locale === 'zh' ? `开始下载 ${generatedImages.length} 张图片` : `Starting download of ${generatedImages.length} images`);
+        
+        for (let index = 0; index < generatedImages.length; index++) {
+          try {
+            await new Promise(resolve => setTimeout(resolve, index * 500)); // 延迟下载避免浏览器阻止
+            await downloadImage(generatedImages[index], index);
+          } catch (error) {
+            console.error(`Error downloading image ${index + 1}:`, error);
+          }
+        }
+      }
+    };
+
+    const shareImage = async (imageUrl?: string, index?: number) => {
+      const urlToShare = imageUrl || generatedImage;
+      console.log('shareImage called with:', { imageUrl, index, urlToShare });
+      
+      if (!urlToShare) {
+        console.error('No URL to share');
+        toast.error(locale === 'zh' ? '没有可分享的图片' : 'No image to share');
+        return;
+      }
+
+      try {
+        console.log('Attempting clipboard write...');
+        await navigator.clipboard.writeText(urlToShare);
+        const message = index !== undefined 
+          ? (locale === 'zh' ? `图片${index + 1}链接已复制到剪贴板` : `Image ${index + 1} link copied to clipboard`)
+          : (locale === 'zh' ? '图像链接已复制到剪贴板' : 'Image link copied to clipboard');
+        console.log('Clipboard write successful');
+        toast.success(message);
+      } catch (error) {
+        console.error('Clipboard error:', error);
+        // Fallback for browsers that don't support clipboard API
+        try {
+          console.log('Attempting fallback copy method...');
           const textArea = document.createElement('textarea');
-          textArea.value = generatedImage;
+          textArea.value = urlToShare;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
           document.body.appendChild(textArea);
+          textArea.focus();
           textArea.select();
-          document.execCommand('copy');
+          const successful = document.execCommand('copy');
           document.body.removeChild(textArea);
-          toast.success(locale === 'zh' ? '图像链接已复制' : 'Image link copied');
+          
+          if (successful) {
+            const message = index !== undefined 
+              ? (locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`)
+              : (locale === 'zh' ? '图像链接已复制' : 'Image link copied');
+            console.log('Fallback copy successful');
+            toast.success(message);
+          } else {
+            throw new Error('execCommand copy failed');
+          }
+        } catch (fallbackError) {
+          console.error('Fallback copy error:', fallbackError);
+          toast.error(locale === 'zh' ? '复制失败，请手动复制链接' : 'Copy failed, please copy link manually');
         }
       }
     };
@@ -639,17 +716,23 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                     />
                     
                     {/* 图片编号 */}
-                    <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+                    <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full z-10">
                       {index + 1}
                     </div>
                     
+
                     {/* 单张图片下载按钮 - 始终可见 */}
-                    <div className="absolute top-2 right-2">
+                    <div className="absolute top-2 right-2 z-20">
                       <Button
-                        onClick={() => downloadImage(imageUrl, index)}
+                        onClick={async (e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log('Download button clicked for image:', index + 1);
+                          await downloadImage(imageUrl, index);
+                        }}
                         size="sm"
                         variant="secondary"
-                        className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0"
+                        className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0 shadow-lg pointer-events-auto"
                         title={locale === 'zh' ? `下载图片 ${index + 1}` : `Download image ${index + 1}`}
                       >
                         <svg 
@@ -672,32 +755,24 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                     </div>
                     
                     {/* 分享单张图片按钮 */}
-                    <div className="absolute bottom-2 right-2">
+                    <div className="absolute bottom-2 right-2 z-20">
                       <Button
-                        onClick={async () => {
-                          try {
-                            await navigator.clipboard.writeText(imageUrl);
-                            toast.success(locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`);
-                          } catch (error) {
-                            const textArea = document.createElement('textarea');
-                            textArea.value = imageUrl;
-                            document.body.appendChild(textArea);
-                            textArea.select();
-                            document.execCommand('copy');
-                            document.body.removeChild(textArea);
-                            toast.success(locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`);
-                          }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log('Share button clicked for image:', index + 1);
+                          shareImage(imageUrl, index);
                         }}
                         size="sm"
                         variant="secondary"
-                        className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0"
+                        className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0 shadow-lg pointer-events-auto"
                         title={locale === 'zh' ? `分享图片 ${index + 1}` : `Share image ${index + 1}`}
                       >
                         <span className="text-white text-xs">🔗</span>
                       </Button>
                     </div>
                     
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg"></div>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg pointer-events-none"></div>
                   </div>
                 ))}
               </div>

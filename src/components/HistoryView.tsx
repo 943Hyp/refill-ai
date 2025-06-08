@@ -169,11 +169,7 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
     toast.success(locale === 'zh' ? `开始下载 ${selectedItems.size} 张图像` : `Starting download of ${selectedItems.size} images`);
   };
 
-  const handleUsePrompt = (prompt: string) => {
-    setPrompt(prompt);
-    setActiveTab('text-to-image');
-    toast.success(t('promptApplied'));
-  };
+
 
   const handleDownloadImage = (imageUrl: string, prompt: string) => {
     const link = document.createElement('a');
@@ -390,190 +386,152 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
 
         {/* History Items */}
         {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {filteredAndSortedHistory.map((item) => (
               <div
                 key={item.id}
-                className={`p-4 bg-background/50 rounded-lg border transition-all duration-200 hover:shadow-lg ${
+                className={`group bg-background/50 rounded-xl border transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden ${
                   selectedItems.has(item.id) ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border hover:border-primary/50'
                 }`}
               >
-                <div className="space-y-3">
-                  <div className="flex items-start justify-between">
+                {/* 图片区域 */}
+                <div className="relative">
+                  {/* 选择框 */}
+                  <div className="absolute top-3 left-3 z-10">
                     <input
                       type="checkbox"
                       checked={selectedItems.has(item.id)}
                       onChange={() => handleSelectItem(item.id)}
-                      className="mt-1"
+                      className="w-4 h-4 rounded border-2 border-white/70 bg-black/20 backdrop-blur-sm"
                     />
-                    <div className="text-right">
-                      <span className="text-xs text-muted-foreground block">
-                        {getRelativeTime(item.timestamp)}
-                      </span>
-                      {item.style && (
-                        <span className="text-xs bg-secondary/50 px-2 py-1 rounded-full">
-                          {item.style}
-                        </span>
-                      )}
-                    </div>
                   </div>
                   
-                  {/* 将所有图片单独显示 */}
-                  <div className="space-y-2">
-                    {item.imageUrls && item.imageUrls.length > 0 ? (
-                      item.imageUrls.map((imageUrl, index) => (
-                        <div key={index} className="relative group">
-                          <img
-                            src={imageUrl}
-                            alt={`Generated ${index + 1}`}
-                            className="w-full aspect-square object-cover rounded-lg"
-                            loading="lazy"
-                          />
-                          {/* 单张图片下载按钮 */}
-                          <div className="absolute top-2 right-2">
-                            <Button
-                              onClick={() => handleDownloadImage(imageUrl, `${item.prompt}-${index + 1}`)}
-                              size="sm"
-                              variant="secondary"
-                              className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0"
-                              title={locale === 'zh' ? `下载图片 ${index + 1}` : `Download image ${index + 1}`}
-                            >
-                              <svg 
-                                width="14" 
-                                height="14" 
-                                viewBox="0 0 24 24" 
-                                fill="none" 
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="text-white"
-                              >
-                                <path 
-                                  d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
-                                  stroke="currentColor" 
-                                  strokeWidth="2" 
-                                  strokeLinecap="round" 
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </Button>
-                          </div>
-                          {/* 分享单张图片按钮 */}
-                          <div className="absolute bottom-2 right-2">
-                            <Button
-                              onClick={async () => {
-                                try {
-                                  await navigator.clipboard.writeText(imageUrl);
-                                  toast.success(locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`);
-                                } catch (error) {
-                                  const textArea = document.createElement('textarea');
-                                  textArea.value = imageUrl;
-                                  document.body.appendChild(textArea);
-                                  textArea.select();
-                                  document.execCommand('copy');
-                                  document.body.removeChild(textArea);
-                                  toast.success(locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`);
-                                }
-                              }}
-                              size="sm"
-                              variant="secondary"
-                              className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0"
-                              title={locale === 'zh' ? `分享图片 ${index + 1}` : `Share image ${index + 1}`}
-                            >
-                              <span className="text-white text-xs">🔗</span>
-                            </Button>
-                          </div>
-                          {/* 图片编号 */}
-                          <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
-                            {index + 1}
-                          </div>
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg"></div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="relative group">
-                        <img
-                          src={item.imageUrl}
-                          alt="Generated"
-                          className="w-full aspect-square object-cover rounded-lg"
-                          loading="lazy"
-                        />
-                        {/* 单张图片下载按钮 */}
-                        <div className="absolute top-2 right-2">
-                          <Button
-                            onClick={() => handleDownloadImage(item.imageUrl, item.prompt)}
-                            size="sm"
-                            variant="secondary"
-                            className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0"
-                            title={locale === 'zh' ? '下载图片' : 'Download image'}
-                          >
-                            <svg 
-                              width="14" 
-                              height="14" 
-                              viewBox="0 0 24 24" 
-                              fill="none" 
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="text-white"
-                            >
-                              <path 
-                                d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
-                                stroke="currentColor" 
-                                strokeWidth="2" 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </Button>
-                        </div>
-                        {/* 分享单张图片按钮 */}
-                        <div className="absolute bottom-2 right-2">
-                          <Button
-                            onClick={async () => {
-                              try {
-                                await navigator.clipboard.writeText(item.imageUrl);
-                                toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
-                              } catch (error) {
-                                const textArea = document.createElement('textarea');
-                                textArea.value = item.imageUrl;
-                                document.body.appendChild(textArea);
-                                textArea.select();
-                                document.execCommand('copy');
-                                document.body.removeChild(textArea);
-                                toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
-                              }
-                            }}
-                            size="sm"
-                            variant="secondary"
-                            className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0"
-                            title={locale === 'zh' ? '分享图片' : 'Share image'}
-                          >
-                            <span className="text-white text-xs">🔗</span>
-                          </Button>
-                        </div>
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg"></div>
+                  {/* 时间标签 */}
+                  <div className="absolute top-3 right-3 z-10">
+                    <span className="text-xs text-white bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full">
+                      {getRelativeTime(item.timestamp)}
+                    </span>
+                  </div>
+                  
+                  {/* 主图片显示 */}
+                  <div className="relative">
+                    <img
+                      src={item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.imageUrl}
+                      alt="Generated"
+                      className="w-full aspect-square object-cover"
+                      loading="lazy"
+                    />
+                    
+                    {/* 多图片指示器 */}
+                    {item.imageUrls && item.imageUrls.length > 1 && (
+                      <div className="absolute bottom-3 left-3 z-10">
+                        <span className="text-xs text-white bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                          </svg>
+                          {item.imageUrls.length}
+                        </span>
                       </div>
+                    )}
+                    
+                    {/* 悬停时显示的操作按钮 */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 opacity-0 group-hover:opacity-100">
+                      <div className="absolute bottom-3 right-3 flex gap-2">
+                        <Button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const imageUrl = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.imageUrl;
+                            handleDownloadImage(imageUrl, item.prompt);
+                          }}
+                          size="sm"
+                          variant="secondary"
+                          className="h-8 w-8 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
+                          title={locale === 'zh' ? '下载图片' : 'Download image'}
+                        >
+                          <svg 
+                            width="14" 
+                            height="14" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="text-gray-700"
+                          >
+                            <path 
+                              d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
+                              stroke="currentColor" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </Button>
+                        <Button
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const imageUrl = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.imageUrl;
+                            try {
+                              await navigator.clipboard.writeText(imageUrl);
+                              toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
+                            } catch (error) {
+                              const textArea = document.createElement('textarea');
+                              textArea.value = imageUrl;
+                              document.body.appendChild(textArea);
+                              textArea.select();
+                              document.execCommand('copy');
+                              document.body.removeChild(textArea);
+                              toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
+                            }
+                          }}
+                          size="sm"
+                          variant="secondary"
+                          className="h-8 w-8 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
+                          title={locale === 'zh' ? '分享图片' : 'Share image'}
+                        >
+                          <span className="text-gray-700 text-xs">🔗</span>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 内容区域 */}
+                <div className="p-4 space-y-3">
+                  {/* 标签区域 */}
+                  <div className="flex flex-wrap gap-1">
+                    {item.style && (
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                        {item.style}
+                      </span>
+                    )}
+                    {item.quality && (
+                      <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
+                        {item.quality}
+                      </span>
+                    )}
+                    {item.aspect && (
+                      <span className="text-xs bg-accent/50 text-accent-foreground px-2 py-1 rounded-full">
+                        {item.aspect}
+                      </span>
                     )}
                   </div>
                   
-                  <p className="text-sm line-clamp-2 leading-relaxed">{item.prompt}</p>
-                  
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleUsePrompt(item.prompt)}
-                      size="sm"
-                      className="flex-1 text-xs"
-                    >
-                      {locale === 'zh' ? '使用提示词' : 'Use Prompt'}
-                    </Button>
-                  </div>
+                  {/* 提示词 */}
+                  <p className="text-sm line-clamp-3 leading-relaxed text-foreground/80">{item.prompt}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {filteredAndSortedHistory.map((item) => (
               <div
                 key={item.id}
-                className={`p-4 bg-background/50 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                className={`group p-4 bg-background/50 rounded-xl border transition-all duration-300 hover:shadow-lg hover:scale-[1.01] ${
                   selectedItems.has(item.id) ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border hover:border-primary/50'
                 }`}
               >
@@ -582,54 +540,113 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                     type="checkbox"
                     checked={selectedItems.has(item.id)}
                     onChange={() => handleSelectItem(item.id)}
-                    className="mt-1 flex-shrink-0"
+                    className="mt-1 flex-shrink-0 w-4 h-4"
                   />
                   
-                  <img
-                    src={item.imageUrl}
-                    alt="Generated"
-                    className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg flex-shrink-0"
-                    loading="lazy"
-                  />
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.imageUrl}
+                      alt="Generated"
+                      className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl shadow-md"
+                      loading="lazy"
+                    />
+                    {/* 多图片指示器 */}
+                    {item.imageUrls && item.imageUrls.length > 1 && (
+                      <div className="absolute -top-1 -right-1">
+                        <span className="text-xs text-white bg-primary px-1.5 py-0.5 rounded-full flex items-center gap-1 shadow-lg">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                          </svg>
+                          {item.imageUrls.length}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   
-                  <div className="flex-1 space-y-2 min-w-0">
+                  <div className="flex-1 space-y-3 min-w-0">
                     <div className="flex justify-between items-start gap-4">
-                      <p className="text-sm leading-relaxed flex-1">{item.prompt}</p>
+                      <p className="text-sm leading-relaxed flex-1 text-foreground/90">{item.prompt}</p>
                       <div className="text-right flex-shrink-0">
-                        <span className="text-xs text-muted-foreground block">
+                        <span className="text-xs text-muted-foreground block mb-2">
                           {getRelativeTime(item.timestamp)}
                         </span>
-                        <div className="flex gap-1 mt-1">
-                          {item.style && (
-                            <span className="text-xs bg-secondary/50 px-2 py-1 rounded-full">
-                              {item.style}
-                            </span>
-                          )}
-                          {item.quality && (
-                            <span className="text-xs bg-accent/50 px-2 py-1 rounded-full">
-                              {item.quality}
-                            </span>
-                          )}
-                        </div>
                       </div>
                     </div>
                     
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => handleUsePrompt(item.prompt)}
-                        size="sm"
-                        className="text-xs"
-                      >
-                        {locale === 'zh' ? '使用提示词' : 'Use Prompt'}
-                      </Button>
-                      <Button
-                        onClick={() => handleDownloadImage(item.imageUrl, item.prompt)}
-                        variant="outline"
-                        size="sm"
-                        className="text-xs"
-                      >
-                        {t('downloadImage')}
-                      </Button>
+                    {/* 标签和操作区域 */}
+                    <div className="flex justify-between items-center">
+                      <div className="flex flex-wrap gap-1">
+                        {item.style && (
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                            {item.style}
+                          </span>
+                        )}
+                        {item.quality && (
+                          <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
+                            {item.quality}
+                          </span>
+                        )}
+                        {item.aspect && (
+                          <span className="text-xs bg-accent/50 text-accent-foreground px-2 py-1 rounded-full">
+                            {item.aspect}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <Button
+                          onClick={() => {
+                            const imageUrl = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.imageUrl;
+                            handleDownloadImage(imageUrl, item.prompt);
+                          }}
+                          variant="outline"
+                          size="sm"
+                          className="text-xs h-8"
+                        >
+                          <svg 
+                            width="12" 
+                            height="12" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="mr-1"
+                          >
+                            <path 
+                              d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
+                              stroke="currentColor" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          {t('downloadImage')}
+                        </Button>
+                        <Button
+                          onClick={async () => {
+                            const imageUrl = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.imageUrl;
+                            try {
+                              await navigator.clipboard.writeText(imageUrl);
+                              toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
+                            } catch (error) {
+                              const textArea = document.createElement('textarea');
+                              textArea.value = imageUrl;
+                              document.body.appendChild(textArea);
+                              textArea.select();
+                              document.execCommand('copy');
+                              document.body.removeChild(textArea);
+                              toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
+                            }
+                          }}
+                          variant="outline"
+                          size="sm"
+                          className="text-xs h-8"
+                        >
+                          🔗 {locale === 'zh' ? '分享' : 'Share'}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
