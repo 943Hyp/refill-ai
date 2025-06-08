@@ -456,6 +456,31 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                               </svg>
                             </Button>
                           </div>
+                          {/* 分享单张图片按钮 */}
+                          <div className="absolute bottom-2 right-2">
+                            <Button
+                              onClick={async () => {
+                                try {
+                                  await navigator.clipboard.writeText(imageUrl);
+                                  toast.success(locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`);
+                                } catch (error) {
+                                  const textArea = document.createElement('textarea');
+                                  textArea.value = imageUrl;
+                                  document.body.appendChild(textArea);
+                                  textArea.select();
+                                  document.execCommand('copy');
+                                  document.body.removeChild(textArea);
+                                  toast.success(locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`);
+                                }
+                              }}
+                              size="sm"
+                              variant="secondary"
+                              className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0"
+                              title={locale === 'zh' ? `分享图片 ${index + 1}` : `Share image ${index + 1}`}
+                            >
+                              <span className="text-white text-xs">🔗</span>
+                            </Button>
+                          </div>
                           {/* 图片编号 */}
                           <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
                             {index + 1}
@@ -496,6 +521,31 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                                 strokeLinejoin="round"
                               />
                             </svg>
+                          </Button>
+                        </div>
+                        {/* 分享单张图片按钮 */}
+                        <div className="absolute bottom-2 right-2">
+                          <Button
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(item.imageUrl);
+                                toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
+                              } catch (error) {
+                                const textArea = document.createElement('textarea');
+                                textArea.value = item.imageUrl;
+                                document.body.appendChild(textArea);
+                                textArea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textArea);
+                                toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
+                              }
+                            }}
+                            size="sm"
+                            variant="secondary"
+                            className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0"
+                            title={locale === 'zh' ? '分享图片' : 'Share image'}
+                          >
+                            <span className="text-white text-xs">🔗</span>
                           </Button>
                         </div>
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg"></div>
