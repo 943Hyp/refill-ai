@@ -643,13 +643,14 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                       {index + 1}
                     </div>
                     
-                    {/* 单张图片下载按钮 */}
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* 单张图片下载按钮 - 始终可见 */}
+                    <div className="absolute top-2 right-2">
                       <Button
                         onClick={() => downloadImage(imageUrl, index)}
                         size="sm"
                         variant="secondary"
-                        className="h-8 w-8 p-0"
+                        className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0"
+                        title={locale === 'zh' ? `下载图片 ${index + 1}` : `Download image ${index + 1}`}
                       >
                         <svg 
                           width="14" 
@@ -667,6 +668,32 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                             strokeLinejoin="round"
                           />
                         </svg>
+                      </Button>
+                    </div>
+                    
+                    {/* 分享单张图片按钮 */}
+                    <div className="absolute bottom-2 right-2">
+                      <Button
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(imageUrl);
+                            toast.success(locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`);
+                          } catch (error) {
+                            const textArea = document.createElement('textarea');
+                            textArea.value = imageUrl;
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            toast.success(locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`);
+                          }
+                        }}
+                        size="sm"
+                        variant="secondary"
+                        className="h-8 w-8 p-0 bg-black/70 hover:bg-black/90 border-0"
+                        title={locale === 'zh' ? `分享图片 ${index + 1}` : `Share image ${index + 1}`}
+                      >
+                        <span className="text-white text-xs">🔗</span>
                       </Button>
                     </div>
                     

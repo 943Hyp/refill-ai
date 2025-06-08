@@ -1,4 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
-  <rect width="512" height="512" rx="96" fill="#3b82f6"/>
-  <path d="M256 128V320M256 320L192 256M256 320L320 256M160 416H352" stroke="white" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景圆形 -->
+  <circle cx="256" cy="256" r="256" fill="url(#gradient)" />
+  
+  <!-- 渐变定义 -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 字母 R -->
+  <path d="M128 128 L128 384 M128 128 L256 128 Q320 128 320 192 Q320 256 256 256 L128 256 M256 256 L320 384" 
+        stroke="white" 
+        stroke-width="40" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="none"/>
+  
+  <!-- AI 装饰点 -->
+  <circle cx="352" cy="160" r="24" fill="white" opacity="0.8"/>
+  <circle cx="384" cy="224" r="16" fill="white" opacity="0.6"/>
+  <circle cx="368" cy="288" r="19.2" fill="white" opacity="0.7"/>
 </svg> 
