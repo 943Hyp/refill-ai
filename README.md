@@ -301,4 +301,4 @@ Refill AI 支持 Progressive Web App (PWA) 功能：
   </p>
 </div>
 
-Last updated: 2025-01-14 - Force deployment trigger
+Last updated: 2025-01-14 - Force deployment trigger v2
