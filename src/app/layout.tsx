@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Refill AI - 免费AI图像生成平台",
-  description: "免费的AI图像生成平台，无需注册，即刻开始创作。支持文生图、图生文等功能。",
+  title: "Refill AI - 免费AI图像生成平台 v2.0",
+  description: "免费的AI图像生成平台，无需注册，即刻开始创作。支持文生图、图生文等功能。支持4张图片生成和完整历史记录。",
   keywords: "AI图像生成,免费AI,文生图,图生文,提示词,AI绘画,人工智能,图像创作",
   authors: [{ name: "Refill AI Team" }],
   creator: "Refill AI",
@@ -152,6 +152,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} antialiased`}>
+          {/* Version: 2.0 - 多图片生成和完整历史记录 */}
           {children}
         
         {/* Service Worker Registration */}
