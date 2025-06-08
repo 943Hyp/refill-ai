@@ -216,7 +216,7 @@ const attributeKeywords: Record<string, string> = {
   '简约': 'simple',
   '复杂': 'complex',
   '精密': 'precise',
-  '粗糙': 'coarse',
+  '质感': 'textured',
   '光泽': 'glossy',
   '哑光': 'matte',
   '透亮': 'translucent',
