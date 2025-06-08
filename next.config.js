@@ -9,6 +9,14 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/plausible-verify',
+        destination: '/plausible-verify.html',
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
