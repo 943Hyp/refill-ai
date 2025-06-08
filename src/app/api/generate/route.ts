@@ -676,30 +676,31 @@ export async function POST(request: NextRequest) {
         input: {
           prompt: enhancedPrompt,
           // FLUX SCHNELL 的参数相对简单，主要依靠 prompt 质量
-          num_outputs: 1,
+          num_outputs: 4, // 生成4张图片
           aspect_ratio: fluxAspectRatio,
           output_format: "webp",
           output_quality: quality === 'ultra' ? 100 : quality === 'high' ? 90 : 80,
         }
       });
 
-      // FLUX SCHNELL 返回的是数组格式
-      let imageUrl: string;
+      // FLUX SCHNELL 返回的是数组格式，现在返回4张图片
+      let imageUrls: string[];
       if (Array.isArray(output) && output.length > 0) {
-        imageUrl = output[0] as string;
+        imageUrls = output as string[];
       } else {
         console.error('Unexpected FLUX SCHNELL output:', output);
         throw new Error('Unexpected output format from FLUX SCHNELL');
       }
 
       console.log('FLUX SCHNELL generation successful:', {
-        imageUrl: imageUrl.substring(0, 100) + '...',
+        imageCount: imageUrls.length,
         model: 'FLUX SCHNELL',
         prompt: enhancedPrompt.substring(0, 100) + '...'
       });
 
       return NextResponse.json({ 
-        imageUrl,
+        imageUrls, // 返回多张图片数组
+        imageUrl: imageUrls[0], // 保持向后兼容
         model: 'FLUX SCHNELL',
         enhancedPrompt 
       });

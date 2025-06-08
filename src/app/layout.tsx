@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Refill AI - 免费AI图像生成平台",
-  description: "免费的AI图像生成平台，无需注册，即刻开始创作。支持文生图、图生文、提示词模板等功能。",
+  description: "免费的AI图像生成平台，无需注册，即刻开始创作。支持文生图、图生文等功能。",
   keywords: "AI图像生成,免费AI,文生图,图生文,提示词,AI绘画,人工智能,图像创作",
   authors: [{ name: "Refill AI Team" }],
   creator: "Refill AI",
@@ -145,7 +145,7 @@ export default function RootLayout({
               "featureList": [
                 "AI图像生成",
                 "图像分析", 
-                "提示词模板",
+        
                 "历史记录"
               ]
             })

@@ -11,20 +11,14 @@ interface RateLimitConfig {
   cooldownTime: number; // 冷却时间（毫秒）
 }
 
-// 限制配置 - 渐进式限制
+// 新的限制配置 - 基于生成次数（每次生成4张图片）
 const RATE_LIMITS: RateLimitConfig[] = [
-  // 第1-8次：无限制
-  { maxRequests: 8, timeWindow: 60 * 1000, cooldownTime: 0 },
-  // 第9-12次：30秒冷却
-  { maxRequests: 12, timeWindow: 5 * 60 * 1000, cooldownTime: 30 * 1000 },
-  // 第13-18次：1分钟冷却
-  { maxRequests: 18, timeWindow: 10 * 60 * 1000, cooldownTime: 60 * 1000 },
-  // 第19-25次：30分钟冷却
-  { maxRequests: 25, timeWindow: 30 * 60 * 1000, cooldownTime: 30 * 60 * 1000 },
-  // 第26-35次：45分钟冷却
-  { maxRequests: 35, timeWindow: 60 * 60 * 1000, cooldownTime: 45 * 60 * 1000 },
-  // 超过35次：60分钟冷却
-  { maxRequests: Infinity, timeWindow: 120 * 60 * 1000, cooldownTime: 60 * 60 * 1000 },
+  // 前10次生成（40张图片）：无限制
+  { maxRequests: 10, timeWindow: 24 * 60 * 60 * 1000, cooldownTime: 0 },
+  // 第11-15次生成：5分钟冷却
+  { maxRequests: 15, timeWindow: 24 * 60 * 60 * 1000, cooldownTime: 5 * 60 * 1000 },
+  // 第16次及以后：30分钟冷却
+  { maxRequests: Infinity, timeWindow: 24 * 60 * 60 * 1000, cooldownTime: 30 * 60 * 1000 },
 ];
 
 class RateLimiter {
@@ -122,34 +116,47 @@ class RateLimiter {
       };
     }
 
-    // 获取当前限制配置
-    const currentLimit = this.getCurrentLimit(usage.count);
-    
-    // 检查时间窗口
-    if (now - usage.lastUsed > currentLimit.timeWindow) {
-      // 重置计数器
+    // 检查24小时时间窗口，如果超过24小时则重置
+    if (now - usage.lastUsed > 24 * 60 * 60 * 1000) {
       usage.count = 0;
       usage.waitUntil = undefined;
+    }
+
+    // 检查当前使用次数并应用相应的限制
+    let needsCooldown = false;
+    let cooldownTime = 0;
+    let message = '';
+
+    if (usage.count >= 10 && usage.count < 15) {
+      // 第11-15次：5分钟冷却
+      needsCooldown = true;
+      cooldownTime = 5 * 60 * 1000;
+      message = `您已使用${usage.count}次（每次4张图），需要等待5分钟`;
+    } else if (usage.count >= 15) {
+      // 第16次及以后：30分钟冷却
+      needsCooldown = true;
+      cooldownTime = 30 * 60 * 1000;
+      message = `您已使用${usage.count}次（每次4张图），需要等待30分钟`;
+    }
+
+    // 如果需要冷却且不在冷却期，设置冷却
+    if (needsCooldown && (!usage.waitUntil || now >= usage.waitUntil)) {
+      usage.waitUntil = now + cooldownTime;
+      this.storage.set(userId, usage);
+      this.saveToStorage();
+      
+      const waitTime = Math.ceil(cooldownTime / 1000);
+      return {
+        allowed: false,
+        waitTime,
+        message,
+        usage
+      };
     }
 
     // 增加使用次数
     usage.count++;
     usage.lastUsed = now;
-
-    // 检查是否需要冷却
-    if (usage.count > currentLimit.maxRequests && currentLimit.cooldownTime > 0) {
-      usage.waitUntil = now + currentLimit.cooldownTime;
-      this.storage.set(userId, usage);
-      this.saveToStorage();
-      
-      const waitTime = Math.ceil(currentLimit.cooldownTime / 1000);
-      return {
-        allowed: false,
-        waitTime,
-        message: `使用次数过多，请等待 ${this.formatTime(waitTime)} 后再试`,
-        usage
-      };
-    }
 
     // 更新存储
     this.storage.set(userId, usage);
@@ -173,21 +180,24 @@ class RateLimiter {
     }
   }
 
-  getUsageInfo(): { count: number; nextCooldown?: string } {
+  getUsageInfo(): { count: number; nextCooldown?: string; totalImages?: number } {
     const userId = this.getUserId();
     const usage = this.storage.get(userId);
     
     if (!usage) {
-      return { count: 0 };
+      return { count: 0, totalImages: 0 };
     }
 
-    const nextLimit = this.getCurrentLimit(usage.count + 1);
-    const nextCooldown = nextLimit.cooldownTime > 0 
-      ? this.formatTime(nextLimit.cooldownTime / 1000)
-      : undefined;
+    let nextCooldown: string | undefined;
+    if (usage.count >= 10 && usage.count < 15) {
+      nextCooldown = '5分钟';
+    } else if (usage.count >= 15) {
+      nextCooldown = '30分钟';
+    }
 
     return {
       count: usage.count,
+      totalImages: usage.count * 4, // 每次生成4张图片
       nextCooldown
     };
   }

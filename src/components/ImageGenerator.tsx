@@ -22,10 +22,11 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
     const [prompt, setPrompt] = useState("");
     const [isEnhancing, setIsEnhancing] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [generatedImages, setGeneratedImages] = useState<string[]>([]);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [generationProgress, setGenerationProgress] = useState(0);
     const [selectedStyle, setSelectedStyle] = useState("none");
-    const [selectedQuality, setSelectedQuality] = useState("standard");
+    const [selectedQuality] = useState("high"); // 固定使用高质量
     const [selectedAspect, setSelectedAspect] = useState("square");
     const [retryCount, setRetryCount] = useState(0);
     const [estimatedTime, setEstimatedTime] = useState(0);
@@ -100,11 +101,7 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
       { id: "fantasy", icon: "🧙", label: locale === 'zh' ? "奇幻" : "Fantasy" },
     ];
 
-    const qualityOptions = [
-      { id: "standard", label: locale === 'zh' ? "标准" : "Standard", desc: locale === 'zh' ? "快速生成" : "Fast generation" },
-      { id: "high", label: locale === 'zh' ? "高质量" : "High Quality", desc: locale === 'zh' ? "更多细节" : "More details" },
-      { id: "ultra", label: locale === 'zh' ? "超高清" : "Ultra HD", desc: locale === 'zh' ? "最佳质量" : "Best quality" },
-    ];
+    // 移除质量选项，固定使用高质量
 
     const aspectOptions = [
       { id: "square", icon: "◼️", label: "1:1", desc: locale === 'zh' ? "正方形" : "Square" },
@@ -122,11 +119,10 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
       }
     }, [prompt]);
 
-    // Calculate estimated time based on quality
+    // 固定估算时间为30秒（高质量）
     useEffect(() => {
-      const timeMap = { standard: 15, high: 30, ultra: 45 };
-      setEstimatedTime(timeMap[selectedQuality as keyof typeof timeMap] || 15);
-    }, [selectedQuality]);
+      setEstimatedTime(30);
+    }, []);
 
     const handleEnhancePrompt = async () => {
       if (!prompt.trim()) {
@@ -137,9 +133,21 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
       setIsEnhancing(true);
       try {
         await new Promise(resolve => setTimeout(resolve, 1500));
-        const enhanced = `${prompt}, masterpiece, best quality, ultra detailed, 8k resolution, professional photography`;
+        
+        // 检测是否为中文提示词
+        const hasChinese = /[\u4e00-\u9fa5]/.test(prompt);
+        
+        let enhanced: string;
+        if (hasChinese) {
+          // 中文增强
+          enhanced = `${prompt}，高质量，精美细节，专业摄影，8K分辨率，杰作级作品，完美构图，自然光线，艺术感强`;
+        } else {
+          // 英文增强
+          enhanced = `${prompt}, masterpiece, best quality, ultra detailed, 8k resolution, professional photography, perfect composition, natural lighting, highly artistic`;
+        }
+        
         setPrompt(enhanced);
-        toast.success(locale === 'zh' ? '提示词已优化' : 'Prompt enhanced');
+        toast.success(locale === 'zh' ? '提示词已优化增强' : 'Prompt enhanced successfully');
       } catch (error) {
         toast.error(t('enhanceFailed'));
       } finally {
@@ -149,6 +157,7 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
 
     const handleClear = () => {
       setPrompt("");
+      setGeneratedImages([]);
       setGeneratedImage(null);
       setGenerationProgress(0);
       setRetryCount(0);
@@ -182,6 +191,7 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
       setIsGenerating(true);
       setGenerationProgress(0);
       if (!isRetry) {
+        setGeneratedImages([]);
         setGeneratedImage(null);
       }
 
@@ -218,13 +228,16 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
           aspectRatio: selectedAspect
         });
         
-        if (!result.imageUrl) {
-          throw new Error('No image URL returned from API');
+        // 处理多张图片或单张图片
+        const imageUrls = result.imageUrls || (result.imageUrl ? [result.imageUrl] : []);
+        
+        if (imageUrls.length === 0) {
+          throw new Error('No image URLs returned from API');
         }
         
-        // 验证图像URL是否可访问
+        // 验证第一张图像URL是否可访问
         try {
-          const imageResponse = await fetch(result.imageUrl, { method: 'HEAD' });
+          const imageResponse = await fetch(imageUrls[0], { method: 'HEAD' });
           if (!imageResponse.ok) {
             throw new Error(`Image URL not accessible: ${imageResponse.status}`);
           }
@@ -233,13 +246,14 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
           // 继续尝试显示，可能是CORS问题
         }
         
-        setGeneratedImage(result.imageUrl);
+        setGeneratedImages(imageUrls);
+        setGeneratedImage(imageUrls[0]); // 保持向后兼容
         
-        // Save to history
+        // Save to history (只保存第一张图片)
         await saveToHistory({
           id: Date.now().toString(),
           prompt,
-          imageUrl: result.imageUrl,
+          imageUrl: imageUrls[0],
           timestamp: new Date(),
           style: selectedStyle,
           quality: selectedQuality,
@@ -308,13 +322,25 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
       setPrompt(randomPrompt);
     };
 
-    const downloadImage = () => {
-      if (generatedImage) {
+    const downloadImage = (imageUrl?: string, index?: number) => {
+      const urlToDownload = imageUrl || generatedImage;
+      if (urlToDownload) {
         const link = document.createElement('a');
-        link.href = generatedImage;
-        link.download = `refill-ai-${Date.now()}.png`;
+        link.href = urlToDownload;
+        link.download = `refill-ai-${Date.now()}${index !== undefined ? `-${index + 1}` : ''}.png`;
         link.click();
         toast.success(t('imageDownloaded'));
+      }
+    };
+
+    const downloadAllImages = () => {
+      if (generatedImages.length > 0) {
+        generatedImages.forEach((imageUrl, index) => {
+          setTimeout(() => {
+            downloadImage(imageUrl, index);
+          }, index * 500); // 延迟下载避免浏览器阻止
+        });
+        toast.success(locale === 'zh' ? `开始下载 ${generatedImages.length} 张图片` : `Starting download of ${generatedImages.length} images`);
       }
     };
 
@@ -441,24 +467,7 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
             </div>
           </div>
 
-          {/* Quality Options */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">{locale === 'zh' ? '图像质量' : 'Image Quality'}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {qualityOptions.map((quality) => (
-                <Button
-                  key={quality.id}
-                  onClick={() => setSelectedQuality(quality.id)}
-                  variant={selectedQuality === quality.id ? "default" : "outline"}
-                  size="sm"
-                  className="text-xs h-auto py-3 flex flex-col items-center gap-1"
-                >
-                  <span className="font-medium">{quality.label}</span>
-                  <span className="text-[10px] text-muted-foreground">{quality.desc}</span>
-                </Button>
-              ))}
-            </div>
-          </div>
+          {/* 质量选项已移除，固定使用高质量 */}
 
           {/* Aspect Ratio Options */}
           <div className="space-y-3">
@@ -524,15 +533,15 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
             </Button>
             
             {/* 生成提示信息 */}
-            {!generatedImage && (
+            {generatedImages.length === 0 && (
               <div className="text-center text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg border border-dashed border-muted-foreground/30">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <span>👇</span>
-                  <span>{locale === 'zh' ? '生成的图片将显示在下方' : 'Generated image will appear below'}</span>
+                  <span>{locale === 'zh' ? '将生成4张图片显示在下方' : '4 images will be generated and displayed below'}</span>
                   <span>👇</span>
                 </div>
                 <div className="text-xs opacity-70">
-                  {locale === 'zh' ? '点击生成按钮后，图片会自动滚动到视图中' : 'After clicking generate, the image will automatically scroll into view'}
+                  {locale === 'zh' ? '点击生成按钮后，4张图片会自动滚动到视图中' : 'After clicking generate, 4 images will automatically scroll into view'}
                 </div>
               </div>
             )}
@@ -579,10 +588,10 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-lg font-medium text-primary">
-                      {locale === 'zh' ? '正在生成您的图片...' : 'Generating your image...'}
+                      {locale === 'zh' ? '正在生成4张图片...' : 'Generating 4 images...'}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {locale === 'zh' ? '图片将在此处显示' : 'Image will appear here'}
+                      {locale === 'zh' ? '4张图片将在此处显示' : '4 images will appear here'}
                     </p>
                   </div>
                   <div className="flex justify-center space-x-1">
@@ -595,52 +604,70 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
             </div>
           )}
 
-          {/* Generated Image - Enhanced with better visibility */}
-          {generatedImage && (
+          {/* Generated Images - 4张图片网格显示 */}
+          {generatedImages.length > 0 && (
             <div className="space-y-4 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/20 shadow-lg" data-generated-image>
               {/* 明显的标题提示 */}
               <div className="flex items-center justify-center gap-2 mb-4">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <h3 className="text-lg font-semibold text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  {locale === 'zh' ? '🎨 生成的图片' : '🎨 Generated Image'}
+                  {locale === 'zh' ? `🎨 生成的图片 (${generatedImages.length}张)` : `🎨 Generated Images (${generatedImages.length})`}
                 </h3>
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               </div>
               
-              <div className="relative group">
-                <img
-                  src={generatedImage}
-                  alt="Generated"
-                  className="w-full rounded-lg border-2 border-primary/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
-                  loading="lazy"
-                  onLoad={() => {
-                    console.log('Image loaded successfully:', generatedImage);
-                    toast.success(locale === 'zh' ? '图像加载完成！' : 'Image loaded successfully!');
-                  }}
-                  onError={(e) => {
-                    console.error('Image load error:', e, 'URL:', generatedImage);
-                    toast.error(locale === 'zh' ? '图像加载失败，请重试' : 'Image failed to load, please retry');
-                  }}
-                />
-                
-                {/* 新增：成功生成的动画效果 */}
-                <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow-lg animate-bounce">
-                  ✨ {locale === 'zh' ? '新生成' : 'New'}
-                </div>
-                
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg"></div>
-                
-                {/* 显示图像URL用于调试 */}
-                <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                  {generatedImage.substring(0, 50)}...
-                </div>
+              {/* 4张图片网格 */}
+              <div className="grid grid-cols-2 gap-4">
+                {generatedImages.map((imageUrl, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={imageUrl}
+                      alt={`Generated ${index + 1}`}
+                      className="w-full aspect-square object-cover rounded-lg border-2 border-primary/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
+                      loading="lazy"
+                      onLoad={() => {
+                        console.log(`Image ${index + 1} loaded successfully:`, imageUrl);
+                        if (index === 0) {
+                          toast.success(locale === 'zh' ? '图像加载完成！' : 'Images loaded successfully!');
+                        }
+                      }}
+                      onError={(e) => {
+                        console.error(`Image ${index + 1} load error:`, e, 'URL:', imageUrl);
+                        toast.error(locale === 'zh' ? `图像${index + 1}加载失败` : `Image ${index + 1} failed to load`);
+                      }}
+                    />
+                    
+                    {/* 图片编号 */}
+                    <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+                      {index + 1}
+                    </div>
+                    
+                    {/* 单张图片下载按钮 */}
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        onClick={() => downloadImage(imageUrl, index)}
+                        size="sm"
+                        variant="secondary"
+                        className="h-8 w-8 p-0"
+                      >
+                        <div className="w-3 h-3 bg-gradient-to-br from-purple-500 to-indigo-600 rounded text-white text-xs flex items-center justify-center font-bold">
+                          R
+                        </div>
+                      </Button>
+                    </div>
+                    
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg"></div>
+                  </div>
+                ))}
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Button onClick={downloadImage} variant="outline" size="sm" className="flex-1 sm:flex-none">
+              
+              {/* 操作按钮 */}
+              <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
+                <Button onClick={downloadAllImages} variant="outline" size="sm" className="flex-1 sm:flex-none">
                   <div className="mr-1 w-4 h-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded text-white text-xs flex items-center justify-center font-bold">
                     R
                   </div>
-                  {t('downloadImage')}
+                  {locale === 'zh' ? '下载全部' : 'Download All'}
                 </Button>
                 <Button onClick={shareImage} variant="outline" size="sm" className="flex-1 sm:flex-none">
                   <span className="mr-1">🔗</span>
