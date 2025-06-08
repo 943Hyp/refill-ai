@@ -57,7 +57,24 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
     return [];
   };
 
-  const filteredAndSortedHistory = history
+  // 将多图片记录展开为单图片记录
+  const expandedHistory = history.flatMap(item => {
+    if (item.imageUrls && item.imageUrls.length > 0) {
+      // 如果有多张图片，为每张图片创建一个独立的记录
+      return item.imageUrls.map((imageUrl, index) => ({
+        ...item,
+        id: `${item.id}-${index}`,
+        imageUrl: imageUrl,
+        imageUrls: undefined, // 清除多图片数组
+        prompt: `${item.prompt} (${index + 1}/4)` // 添加图片编号
+      }));
+    } else {
+      // 如果只有单张图片，保持原样
+      return [item];
+    }
+  });
+
+  const filteredAndSortedHistory = expandedHistory
     .filter(item => {
       // Search filter
       const matchesSearch = item.prompt.toLowerCase().includes(searchTerm.toLowerCase());
@@ -413,154 +430,72 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                     </span>
                   </div>
                   
-                  {/* 显示所有图片 - 横向排列 */}
-                  <div className="grid grid-cols-4 gap-2">
-                    {item.imageUrls && item.imageUrls.length > 0 ? (
-                      item.imageUrls.map((imageUrl, index) => (
-                        <div key={index} className="relative group/image">
-                          <img
-                            src={imageUrl}
-                            alt={`Generated ${index + 1}`}
-                            className="w-full aspect-square object-cover rounded-lg border border-border/50"
-                            loading="lazy"
-                          />
-                          
-                          {/* 图片编号 */}
-                          <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
-                            {index + 1}
-                          </div>
-                          
-                          {/* 单张图片操作按钮 */}
-                          <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/20 transition-all duration-300 opacity-0 group-hover/image:opacity-100 rounded-lg">
-                            <div className="absolute bottom-2 right-2 flex gap-1">
-                              <Button
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  console.log('Download button clicked for history image:', index + 1);
-                                  handleDownloadImage(imageUrl, `${item.prompt}-${index + 1}`);
-                                }}
-                                size="sm"
-                                variant="secondary"
-                                className="h-6 w-6 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
-                                title={locale === 'zh' ? `下载图片 ${index + 1}` : `Download image ${index + 1}`}
-                              >
-                                <svg 
-                                  width="10" 
-                                  height="10" 
-                                  viewBox="0 0 24 24" 
-                                  fill="none" 
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="text-gray-700"
-                                >
-                                  <path 
-                                    d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
-                                    stroke="currentColor" 
-                                    strokeWidth="2" 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </Button>
-                              <Button
-                                onClick={async (e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  console.log('Share button clicked for history image:', index + 1);
-                                  try {
-                                    await navigator.clipboard.writeText(imageUrl);
-                                    toast.success(locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`);
-                                  } catch (error) {
-                                    const textArea = document.createElement('textarea');
-                                    textArea.value = imageUrl;
-                                    document.body.appendChild(textArea);
-                                    textArea.select();
-                                    document.execCommand('copy');
-                                    document.body.removeChild(textArea);
-                                    toast.success(locale === 'zh' ? `图片${index + 1}链接已复制` : `Image ${index + 1} link copied`);
-                                  }
-                                }}
-                                size="sm"
-                                variant="secondary"
-                                className="h-6 w-6 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
-                                title={locale === 'zh' ? `分享图片 ${index + 1}` : `Share image ${index + 1}`}
-                              >
-                                <span className="text-gray-700 text-xs">🔗</span>
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="relative group/image">
-                        <img
-                          src={item.imageUrl}
-                          alt="Generated"
-                          className="w-full aspect-square object-cover rounded-lg border border-border/50"
-                          loading="lazy"
-                        />
-                        
-                        {/* 单张图片操作按钮 */}
-                        <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/20 transition-all duration-300 opacity-0 group-hover/image:opacity-100 rounded-lg">
-                          <div className="absolute bottom-2 right-2 flex gap-1">
-                            <Button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                console.log('Download button clicked for single history image');
-                                handleDownloadImage(item.imageUrl, item.prompt);
-                              }}
-                              size="sm"
-                              variant="secondary"
-                              className="h-7 w-7 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
-                              title={locale === 'zh' ? '下载图片' : 'Download image'}
-                            >
-                              <svg 
-                                width="12" 
-                                height="12" 
-                                viewBox="0 0 24 24" 
-                                fill="none" 
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="text-gray-700"
-                              >
-                                <path 
-                                  d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
-                                  stroke="currentColor" 
-                                  strokeWidth="2" 
-                                  strokeLinecap="round" 
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </Button>
-                            <Button
-                              onClick={async (e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                console.log('Share button clicked for single history image');
-                                try {
-                                  await navigator.clipboard.writeText(item.imageUrl);
-                                  toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
-                                } catch (error) {
-                                  const textArea = document.createElement('textarea');
-                                  textArea.value = item.imageUrl;
-                                  document.body.appendChild(textArea);
-                                  textArea.select();
-                                  document.execCommand('copy');
-                                  document.body.removeChild(textArea);
-                                  toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
-                                }
-                              }}
-                              size="sm"
-                              variant="secondary"
-                              className="h-7 w-7 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
-                              title={locale === 'zh' ? '分享图片' : 'Share image'}
-                            >
-                              <span className="text-gray-700 text-xs">🔗</span>
-                            </Button>
-                          </div>
-                        </div>
+                  {/* 显示单张图片 */}
+                  <div className="relative">
+                    <img
+                      src={item.imageUrl}
+                      alt="Generated"
+                      className="w-full aspect-square object-cover"
+                      loading="lazy"
+                    />
+                    
+                    {/* 悬停时显示的操作按钮 */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 opacity-0 group-hover:opacity-100">
+                      <div className="absolute bottom-3 right-3 flex gap-2">
+                        <Button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDownloadImage(item.imageUrl, item.prompt);
+                          }}
+                          size="sm"
+                          variant="secondary"
+                          className="h-8 w-8 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
+                          title={locale === 'zh' ? '下载图片' : 'Download image'}
+                        >
+                          <svg 
+                            width="14" 
+                            height="14" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="text-gray-700"
+                          >
+                            <path 
+                              d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
+                              stroke="currentColor" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </Button>
+                        <Button
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            try {
+                              await navigator.clipboard.writeText(item.imageUrl);
+                              toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
+                            } catch (error) {
+                              const textArea = document.createElement('textarea');
+                              textArea.value = item.imageUrl;
+                              document.body.appendChild(textArea);
+                              textArea.select();
+                              document.execCommand('copy');
+                              document.body.removeChild(textArea);
+                              toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
+                            }
+                          }}
+                          size="sm"
+                          variant="secondary"
+                          className="h-8 w-8 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
+                          title={locale === 'zh' ? '分享图片' : 'Share image'}
+                        >
+                          <span className="text-gray-700 text-xs">🔗</span>
+                        </Button>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
                 
@@ -610,25 +545,11 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                   
                   <div className="relative flex-shrink-0">
                     <img
-                      src={item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.imageUrl}
+                      src={item.imageUrl}
                       alt="Generated"
                       className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl shadow-md"
                       loading="lazy"
                     />
-                    {/* 多图片指示器 */}
-                    {item.imageUrls && item.imageUrls.length > 1 && (
-                      <div className="absolute -top-1 -right-1">
-                        <span className="text-xs text-white bg-primary px-1.5 py-0.5 rounded-full flex items-center gap-1 shadow-lg">
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-                            <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-                            <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-                            <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-                          </svg>
-                          {item.imageUrls.length}
-                        </span>
-                      </div>
-                    )}
                   </div>
                   
                   <div className="flex-1 space-y-3 min-w-0">
@@ -664,8 +585,7 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <Button
                           onClick={() => {
-                            const imageUrl = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.imageUrl;
-                            handleDownloadImage(imageUrl, item.prompt);
+                            handleDownloadImage(item.imageUrl, item.prompt);
                           }}
                           variant="outline"
                           size="sm"
@@ -691,13 +611,12 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                         </Button>
                         <Button
                           onClick={async () => {
-                            const imageUrl = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.imageUrl;
                             try {
-                              await navigator.clipboard.writeText(imageUrl);
+                              await navigator.clipboard.writeText(item.imageUrl);
                               toast.success(locale === 'zh' ? '图片链接已复制' : 'Image link copied');
                             } catch (error) {
                               const textArea = document.createElement('textarea');
-                              textArea.value = imageUrl;
+                              textArea.value = item.imageUrl;
                               document.body.appendChild(textArea);
                               textArea.select();
                               document.execCommand('copy');
