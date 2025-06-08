@@ -650,9 +650,22 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
                         variant="secondary"
                         className="h-8 w-8 p-0"
                       >
-                        <div className="w-3 h-3 bg-gradient-to-br from-purple-500 to-indigo-600 rounded text-white text-xs flex items-center justify-center font-bold">
-                          R
-                        </div>
+                        <svg 
+                          width="14" 
+                          height="14" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="text-white"
+                        >
+                          <path 
+                            d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
+                            stroke="currentColor" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                          />
+                        </svg>
                       </Button>
                     </div>
                     
@@ -664,9 +677,22 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
               {/* 操作按钮 */}
               <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
                 <Button onClick={downloadAllImages} variant="outline" size="sm" className="flex-1 sm:flex-none">
-                  <div className="mr-1 w-4 h-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded text-white text-xs flex items-center justify-center font-bold">
-                    R
-                  </div>
+                  <svg 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="mr-1"
+                  >
+                    <path 
+                      d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                   {locale === 'zh' ? '下载全部' : 'Download All'}
                 </Button>
                 <Button onClick={shareImage} variant="outline" size="sm" className="flex-1 sm:flex-none">
