@@ -76,6 +76,7 @@ export interface GeneratedImage {
   id: string;
   prompt: string;
   imageUrl: string;
+  imageUrls?: string[]; // 支持多张图片
   timestamp: Date;
   style?: string;
   quality?: string;

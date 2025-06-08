@@ -183,6 +183,18 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
     toast.success(t('imageDownloaded'));
   };
 
+  const handleDownloadAllImages = (imageUrls: string[], prompt: string) => {
+    imageUrls.forEach((imageUrl, index) => {
+      setTimeout(() => {
+        const link = document.createElement('a');
+        link.href = imageUrl;
+        link.download = `${prompt.slice(0, 20).replace(/[^a-zA-Z0-9]/g, '_')}-${index + 1}-${Date.now()}.png`;
+        link.click();
+      }, index * 500); // 延迟下载避免浏览器阻止
+    });
+    toast.success(locale === 'zh' ? `开始下载 ${imageUrls.length} 张图片` : `Starting download of ${imageUrls.length} images`);
+  };
+
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
       year: 'numeric',
@@ -353,9 +365,22 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                   variant="outline"
                   size="sm"
                 >
-                  <div className="mr-1 w-4 h-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded text-white text-xs flex items-center justify-center font-bold">
-                    R
-                  </div>
+                  <svg 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="mr-1"
+                  >
+                    <path 
+                      d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                   {locale === 'zh' ? '批量下载' : 'Batch Download'} ({selectedItems.size})
                 </Button>
               </>
@@ -394,12 +419,32 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                   </div>
                   
                   <div className="relative group">
-                    <img
-                      src={item.imageUrl}
-                      alt="Generated"
-                      className="w-full aspect-square object-cover rounded-lg"
-                      loading="lazy"
-                    />
+                    {/* 如果有多张图片，显示网格 */}
+                    {item.imageUrls && item.imageUrls.length > 1 ? (
+                      <div className="grid grid-cols-2 gap-1">
+                        {item.imageUrls.slice(0, 4).map((imageUrl, index) => (
+                          <img
+                            key={index}
+                            src={imageUrl}
+                            alt={`Generated ${index + 1}`}
+                            className="w-full aspect-square object-cover rounded-lg"
+                            loading="lazy"
+                          />
+                        ))}
+                        {item.imageUrls.length > 4 && (
+                          <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                            +{item.imageUrls.length - 4}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <img
+                        src={item.imageUrl}
+                        alt="Generated"
+                        className="w-full aspect-square object-cover rounded-lg"
+                        loading="lazy"
+                      />
+                    )}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg"></div>
                   </div>
                   
@@ -413,16 +458,55 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                     >
                       {locale === 'zh' ? '使用' : 'Use'}
                     </Button>
-                    <Button
-                      onClick={() => handleDownloadImage(item.imageUrl, item.prompt)}
-                      variant="outline"
-                      size="sm"
-                      className="px-2"
-                    >
-                      <div className="w-4 h-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded text-white text-xs flex items-center justify-center font-bold">
-                        R
-                      </div>
-                    </Button>
+                    {item.imageUrls && item.imageUrls.length > 1 ? (
+                      <Button
+                        onClick={() => handleDownloadAllImages(item.imageUrls!, item.prompt)}
+                        variant="outline"
+                        size="sm"
+                        className="px-2"
+                        title={locale === 'zh' ? `下载全部 ${item.imageUrls.length} 张图片` : `Download all ${item.imageUrls.length} images`}
+                      >
+                        <svg 
+                          width="14" 
+                          height="14" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path 
+                            d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
+                            stroke="currentColor" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span className="ml-1 text-xs">{item.imageUrls.length}</span>
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => handleDownloadImage(item.imageUrl, item.prompt)}
+                        variant="outline"
+                        size="sm"
+                        className="px-2"
+                      >
+                        <svg 
+                          width="14" 
+                          height="14" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path 
+                            d="M12 3V16M12 16L8 12M12 16L16 12M4 21H20" 
+                            stroke="currentColor" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

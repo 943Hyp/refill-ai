@@ -249,11 +249,12 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
         setGeneratedImages(imageUrls);
         setGeneratedImage(imageUrls[0]); // 保持向后兼容
         
-        // Save to history (只保存第一张图片)
+        // Save to history (保存所有图片)
         await saveToHistory({
           id: Date.now().toString(),
           prompt,
-          imageUrl: imageUrls[0],
+          imageUrl: imageUrls[0], // 主图片（向后兼容）
+          imageUrls: imageUrls, // 所有图片
           timestamp: new Date(),
           style: selectedStyle,
           quality: selectedQuality,
