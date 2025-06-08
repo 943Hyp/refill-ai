@@ -637,7 +637,9 @@ const ImageGenerator = forwardRef<ImageGeneratorRef, ImageGeneratorProps>(
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button onClick={downloadImage} variant="outline" size="sm" className="flex-1 sm:flex-none">
-                  <span className="mr-1">📥</span>
+                  <div className="mr-1 w-4 h-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded text-white text-xs flex items-center justify-center font-bold">
+                    R
+                  </div>
                   {t('downloadImage')}
                 </Button>
                 <Button onClick={shareImage} variant="outline" size="sm" className="flex-1 sm:flex-none">

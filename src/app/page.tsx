@@ -59,10 +59,13 @@ export default function Home() {
               <div className="mb-8">
                 <button
                   onClick={() => setShowApp(false)}
-                  className="flex items-center gap-2 text-base md:text-lg font-medium px-4 py-2.5 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105"
+                  className="flex items-center gap-3 text-lg md:text-xl font-bold px-6 py-4 rounded-xl bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-600 text-white hover:shadow-2xl hover:from-purple-600 hover:via-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-110 border-2 border-white/20 backdrop-blur-sm"
                 >
-                  <span className="text-xl">←</span>
-                  <span>{locale === 'zh' ? '返回首页' : 'Back to Home'}</span>
+                  <span className="text-2xl animate-pulse">←</span>
+                  <span className="drop-shadow-lg">{locale === 'zh' ? '返回首页' : 'Back to Home'}</span>
+                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-bold">🏠</span>
+                  </div>
                 </button>
               </div>
 

@@ -353,7 +353,9 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                   variant="outline"
                   size="sm"
                 >
-                  <span className="mr-1">📥</span>
+                  <div className="mr-1 w-4 h-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded text-white text-xs flex items-center justify-center font-bold">
+                    R
+                  </div>
                   {locale === 'zh' ? '批量下载' : 'Batch Download'} ({selectedItems.size})
                 </Button>
               </>
@@ -417,7 +419,9 @@ const HistoryView = ({ setPrompt, setActiveTab, locale }: HistoryViewProps) => {
                       size="sm"
                       className="px-2"
                     >
-                      📥
+                      <div className="w-4 h-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded text-white text-xs flex items-center justify-center font-bold">
+                        R
+                      </div>
                     </Button>
                   </div>
                 </div>
