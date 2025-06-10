@@ -17,6 +17,19 @@ const nextConfig = {
       },
     ];
   },
+  async headers() {
+    return [
+      {
+        source: '/plausible-verify.html',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'text/html',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
